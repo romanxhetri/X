@@ -2,12 +2,10 @@ import React, { useEffect, useRef, useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 
 // --- Supabase Config ---
-// Safe environment access for deployment
 const getEnv = (key: string) => (typeof process !== 'undefined' && process.env ? process.env[key] : '') || '';
 const SUPABASE_URL = getEnv('NEXT_PUBLIC_SUPABASE_URL') || 'https://xyzcompany.supabase.co';
 const SUPABASE_KEY = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY') || 'public-anon-key';
@@ -96,65 +94,66 @@ const HUBS: HubData[] = [
   { id: "tools", name: "Tools Hub", type: 'tools', radius: 2.5, distance: 125, speed: 0.002, color: 0x4444ff, description: "16+ AI Utilities Dashboard", icon: "🛠️" },
 ];
 
-// --- Expanded Product Data ---
+// --- Expanded Product Data (Daraz/Hamrobazar Inspired) ---
 const INITIAL_PRODUCTS: Product[] = [
-    // Mobile Hub (13 items to test pagination > 8)
-    { id: "m1", hubId: "mobile", name: "iPhone 15 Pro Max", price: 185000, originalPrice: 195000, rating: 4.9, reviews: 120, seller: "Apple Official", stock: 15, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=300&q=80", specs: { "Chip": "A17 Pro", "Storage": "256GB" } },
-    { id: "m2", hubId: "mobile", name: "Samsung S24 Ultra", price: 170000, rating: 4.8, reviews: 95, seller: "Samsung Nepal", stock: 20, image: "https://images.unsplash.com/photo-1610945265078-3858a0828671?auto=format&fit=crop&w=300&q=80" },
-    { id: "m3", hubId: "mobile", name: "Google Pixel 8 Pro", price: 120000, rating: 4.7, reviews: 45, seller: "Google Store", stock: 12, image: "https://images.unsplash.com/photo-1598327105666-5b89351aff23?auto=format&fit=crop&w=300&q=80" },
-    { id: "m4", hubId: "mobile", name: "OnePlus 12", price: 95000, rating: 4.6, reviews: 60, seller: "OnePlus Nepal", stock: 30, image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=300&q=80" },
-    { id: "m5", hubId: "mobile", name: "Xiaomi 14", price: 85000, rating: 4.5, reviews: 80, seller: "Mi Nepal", stock: 50, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80" },
-    { id: "m6", hubId: "mobile", name: "Sony Xperia 1 V", price: 140000, rating: 4.7, reviews: 20, seller: "Sony Center", stock: 10, image: "https://images.unsplash.com/photo-1595941069915-4ebc5197c14a?auto=format&fit=crop&w=300&q=80" },
-    { id: "m7", hubId: "mobile", name: "Nothing Phone 2", price: 65000, rating: 4.4, reviews: 110, seller: "Oliz Store", stock: 40, image: "https://images.unsplash.com/photo-1678911820864-e2c567c655d7?auto=format&fit=crop&w=300&q=80" },
-    { id: "m8", hubId: "mobile", name: "Honor Magic 6 Pro", price: 130000, rating: 4.8, reviews: 15, seller: "Honor NP", stock: 5, image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=300&q=80" },
-    { id: "m9", hubId: "mobile", name: "Realme GT 5", price: 55000, rating: 4.3, reviews: 70, seller: "Realme Store", stock: 60, image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?auto=format&fit=crop&w=300&q=80" },
-    { id: "m10", hubId: "mobile", name: "iPhone 13", price: 90000, rating: 4.8, reviews: 500, seller: "Apple Official", stock: 100, image: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?auto=format&fit=crop&w=300&q=80" },
-    { id: "m11", hubId: "mobile", name: "Samsung Z Fold 5", price: 220000, rating: 4.7, reviews: 40, seller: "Samsung Nepal", stock: 10, image: "https://images.unsplash.com/photo-1623126908029-58cb08a2b272?auto=format&fit=crop&w=300&q=80" },
-    { id: "m12", hubId: "mobile", name: "Poco F5", price: 42000, rating: 4.5, reviews: 200, seller: "Poco Official", stock: 80, image: "https://images.unsplash.com/photo-1592965647716-4af4385a4918?auto=format&fit=crop&w=300&q=80" },
-    { id: "m13", hubId: "mobile", name: "Infinix Zero 30", price: 35000, rating: 4.2, reviews: 50, seller: "Infinix Nepal", stock: 30, image: "https://images.unsplash.com/photo-1567581935884-3349723552ca?auto=format&fit=crop&w=300&q=80" },
+    // --- Mobile Hub ---
+    { id: "m1", hubId: "mobile", name: "iPhone 15 Pro Max (256GB)", price: 185000, originalPrice: 195000, rating: 4.9, reviews: 120, seller: "EvoStore", stock: 15, image: "https://images.unsplash.com/photo-1696446701796-da61225697cc?auto=format&fit=crop&w=300&q=80", description: "Natural Titanium, A17 Pro Chip, the most powerful iPhone." },
+    { id: "m2", hubId: "mobile", name: "Samsung Galaxy S24 Ultra", price: 184999, rating: 4.8, reviews: 95, seller: "Samsung Nepal", stock: 20, image: "https://images.unsplash.com/photo-1706606992982-b7e252a92771?auto=format&fit=crop&w=300&q=80", description: "Titanium Grey, Galaxy AI features, S-Pen included." },
+    { id: "m3", hubId: "mobile", name: "Redmi Note 13 Pro+ 5G", price: 47999, rating: 4.6, reviews: 300, seller: "Daraz Mall", stock: 50, image: "https://images.unsplash.com/photo-1707831839230-22c7d97793d2?auto=format&fit=crop&w=300&q=80", description: "200MP Camera, 120W HyperCharge, Curved Display." },
+    { id: "m4", hubId: "mobile", name: "OnePlus 12 (16/512GB)", price: 139999, rating: 4.7, reviews: 45, seller: "Kratos Tech", stock: 10, image: "https://images.unsplash.com/photo-1678957949479-b1e876a38210?auto=format&fit=crop&w=300&q=80", description: "Snapdragon 8 Gen 3, Hasselblad Camera, 100W Charging." },
+    { id: "m5", hubId: "mobile", name: "Poco X6 Pro", price: 46999, rating: 4.8, reviews: 210, seller: "Daraz Mall", stock: 40, image: "https://images.unsplash.com/photo-1623945939227-37599c277732?auto=format&fit=crop&w=300&q=80", description: "Best Gaming Phone under 50k, Dimensity 8300 Ultra." },
+    { id: "m6", hubId: "mobile", name: "Honor X9b", price: 43990, rating: 4.5, reviews: 150, seller: "Honor Nepal", stock: 25, image: "https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&w=300&q=80", description: "Anti-Drop Display, 5800mAh Battery, Ultra Durable." },
+    { id: "m7", hubId: "mobile", name: "Realme 12 Pro+", price: 50999, rating: 4.4, reviews: 80, seller: "Realme Store", stock: 30, image: "https://images.unsplash.com/photo-1621330386762-c3619939ce2a?auto=format&fit=crop&w=300&q=80", description: "Periscope Portrait Camera, Luxury Watch Design." },
+    { id: "m8", hubId: "mobile", name: "Google Pixel 8a", price: 65000, rating: 4.6, reviews: 30, seller: "M.K. Tradeline", stock: 8, image: "https://images.unsplash.com/photo-1698226992770-0777264a747c?auto=format&fit=crop&w=300&q=80", description: "Google Tensor G3, Best AI Camera, 7 years updates." },
+    { id: "m9", hubId: "mobile", name: "Vivo V30 5G", price: 60999, rating: 4.5, reviews: 60, seller: "Vivo Nepal", stock: 20, image: "https://images.unsplash.com/photo-1619623293838-34823299712a?auto=format&fit=crop&w=300&q=80", description: "Aura Light Portrait, Slimmest 5000mAh Phone." },
+    { id: "m10", hubId: "mobile", name: "Benco S1 Pro", price: 19999, rating: 4.2, reviews: 500, seller: "Benco Mobile", stock: 100, image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80", description: "Best budget phone, 256GB storage under 20k." },
 
-    // Laptop Hub (10 items)
-    { id: "l1", hubId: "laptop", name: "MacBook Air M3", price: 165000, rating: 4.9, reviews: 89, seller: "EvoStore", stock: 10, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&w=300&q=80" },
-    { id: "l2", hubId: "laptop", name: "Dell XPS 15", price: 210000, rating: 4.7, reviews: 34, seller: "Dell Nepal", stock: 5, image: "https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&w=300&q=80" },
-    { id: "l3", hubId: "laptop", name: "ASUS ROG Zephyrus", price: 230000, rating: 4.8, reviews: 110, seller: "Nagmani Int", stock: 8, image: "https://images.unsplash.com/photo-1533038590840-1cde6e668a91?auto=format&fit=crop&w=300&q=80" },
-    { id: "l4", hubId: "laptop", name: "HP Spectre x360", price: 175000, rating: 4.6, reviews: 20, seller: "HP Store", stock: 7, image: "https://images.unsplash.com/photo-1544731612-de7f96afe55f?auto=format&fit=crop&w=300&q=80" },
-    { id: "l5", hubId: "laptop", name: "Lenovo ThinkPad X1", price: 190000, rating: 4.9, reviews: 50, seller: "Megatech", stock: 15, image: "https://images.unsplash.com/photo-1588872657578-139a62696160?auto=format&fit=crop&w=300&q=80" },
-    { id: "l6", hubId: "laptop", name: "Acer Predator Helios", price: 180000, rating: 4.5, reviews: 60, seller: "Acer Nepal", stock: 12, image: "https://images.unsplash.com/photo-1595327656903-2f54e37ce09b?auto=format&fit=crop&w=300&q=80" },
-    { id: "l7", hubId: "laptop", name: "Razer Blade 14", price: 280000, rating: 4.8, reviews: 25, seller: "Gamers Hood", stock: 3, image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=300&q=80" },
-    { id: "l8", hubId: "laptop", name: "MSI Raider GE78", price: 320000, rating: 4.9, reviews: 10, seller: "Ocean Comp", stock: 2, image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=300&q=80" },
-    { id: "l9", hubId: "laptop", name: "Surface Laptop 5", price: 155000, rating: 4.6, reviews: 18, seller: "Microsoft", stock: 20, image: "https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=300&q=80" },
-    { id: "l10", hubId: "laptop", name: "MacBook Pro M3 Max", price: 450000, rating: 5.0, reviews: 15, seller: "EvoStore", stock: 5, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?auto=format&fit=crop&w=300&q=80" },
+    // --- Laptop Hub ---
+    { id: "l1", hubId: "laptop", name: "Acer Nitro V 15 (2024)", price: 105000, originalPrice: 115000, rating: 4.7, reviews: 200, seller: "ITTI Computer", stock: 25, image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=300&q=80", description: "i5-13th Gen, RTX 4050 6GB, 144Hz, Best Budget Gaming Laptop." },
+    { id: "l2", hubId: "laptop", name: "Lenovo LOQ 15", price: 112000, rating: 4.8, reviews: 150, seller: "Megatech", stock: 15, image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?auto=format&fit=crop&w=300&q=80", description: "Ryzen 7 7840HS, RTX 4060, The new budget king." },
+    { id: "l3", hubId: "laptop", name: "MacBook Air M2 (13-inch)", price: 145000, rating: 4.9, reviews: 89, seller: "Oliz Store", stock: 10, image: "https://images.unsplash.com/photo-1655397509783-da72cb9ca7c3?auto=format&fit=crop&w=300&q=80", description: "Midnight Color, 8GB/256GB, Slimmest & Fastest for work." },
+    { id: "l4", hubId: "laptop", name: "Asus TUF F15", price: 98000, rating: 4.6, reviews: 300, seller: "Nagmani", stock: 30, image: "https://images.unsplash.com/photo-1587613754760-cd9a285831b3?auto=format&fit=crop&w=300&q=80", description: "Military Grade Toughness, i5-11th Gen, RTX 2050." },
+    { id: "l5", hubId: "laptop", name: "Dell XPS 13 Plus", price: 230000, rating: 4.7, reviews: 20, seller: "Generation Next", stock: 5, image: "https://images.unsplash.com/photo-1593642632823-8f78536788c6?auto=format&fit=crop&w=300&q=80", description: "Futuristic Design, OLED Touch, i7-13th Gen." },
+    { id: "l6", hubId: "laptop", name: "HP Victus 15", price: 88000, rating: 4.5, reviews: 120, seller: "Bigbyte", stock: 40, image: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9?auto=format&fit=crop&w=300&q=80", description: "Best Value Gaming, Ryzen 5 5600H, RX 6500M." },
+    { id: "l7", hubId: "laptop", name: "Lenovo Legion Pro 5i", price: 215000, rating: 4.9, reviews: 60, seller: "Megatech", stock: 8, image: "https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?auto=format&fit=crop&w=300&q=80", description: "i9-13900HX, RTX 4070, Ultimate Gaming Beast." },
+    { id: "l8", hubId: "laptop", name: "Acer Swift Go 14", price: 92000, rating: 4.6, reviews: 45, seller: "Acer Nepal", stock: 20, image: "https://images.unsplash.com/photo-1544731612-de7f96afe55f?auto=format&fit=crop&w=300&q=80", description: "OLED Display, Ultra-lightweight, Intel Evo Certified." },
 
-    // Fashion Hub
-    { id: "f1", hubId: "fashion", name: "Designer Hoodie", price: 3500, rating: 4.6, reviews: 400, seller: "Urban Nepal", stock: 100, image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=300&q=80" },
-    { id: "f2", hubId: "fashion", name: "Nike Air Jordan", price: 18000, rating: 4.8, reviews: 250, seller: "Nike KTM", stock: 15, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80" },
-    { id: "f3", hubId: "fashion", name: "Denim Jacket", price: 4500, rating: 4.4, reviews: 80, seller: "Denim Co", stock: 40, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80" },
-    { id: "f4", hubId: "fashion", name: "RayBan Aviator", price: 22000, rating: 4.7, reviews: 120, seller: "Sunglass Hut", stock: 25, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=300&q=80" },
-    { id: "f5", hubId: "fashion", name: "Leather Satchel", price: 12500, rating: 4.9, reviews: 30, seller: "Leather Craft", stock: 10, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80" },
-    { id: "f6", hubId: "fashion", name: "Classic Trench Coat", price: 8500, rating: 4.5, reviews: 40, seller: "Zara", stock: 20, image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=300&q=80" },
-    { id: "f7", hubId: "fashion", name: "Adidas Ultraboost", price: 22000, rating: 4.8, reviews: 180, seller: "Adidas KTM", stock: 30, image: "https://images.unsplash.com/photo-1587563871167-1ee9c731aef4?auto=format&fit=crop&w=300&q=80" },
-    { id: "f8", hubId: "fashion", name: "Gold Plated Watch", price: 15000, rating: 4.3, reviews: 60, seller: "Time House", stock: 50, image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=300&q=80" },
-
-    // 2nd Hand Market
-    { id: "s1", hubId: "secondhand", name: "Used Pulsar 220F", price: 140000, rating: 4.2, reviews: 12, seller: "Ramesh B.", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=300&q=80", description: "Good condition, 2020 model." },
-    { id: "s2", hubId: "secondhand", name: "Sony A7III (Body)", price: 150000, rating: 4.5, reviews: 5, seller: "Suresh P.", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80", description: "Shutter count 20k." },
-    { id: "s3", hubId: "secondhand", name: "iPhone 11 (64GB)", price: 35000, rating: 4.0, reviews: 8, seller: "Mobile House", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1573148195900-7845dcb9b858?auto=format&fit=crop&w=300&q=80", description: "Minor scratches on screen." },
-    { id: "s4", hubId: "secondhand", name: "Mountain Bike", price: 15000, rating: 4.3, reviews: 3, seller: "Hari K.", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?auto=format&fit=crop&w=300&q=80", description: "Needs new tires." },
+    // --- 2nd Hand Market (Hamrobazar Style) ---
+    { id: "s1", hubId: "secondhand", name: "Royal Enfield Classic 350", price: 350000, rating: 4.5, reviews: 5, seller: "Suresh Bikers", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=300&q=80", description: "2019 Model, Gunmetal Grey, Lot 85, Fresh Condition." },
+    { id: "s2", hubId: "secondhand", name: "Hyundai Grand i10 (2016)", price: 1850000, rating: 4.2, reviews: 2, seller: "Kathmandu Recondition", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1599321303867-047b4b3c02eb?auto=format&fit=crop&w=300&q=80", description: "Single Hand, Magna Variant, 45k km running." },
+    { id: "s3", hubId: "secondhand", name: "iPhone 12 Pro (128GB)", price: 62000, rating: 4.0, reviews: 8, seller: "Mobile Hub Putalisadak", stock: 2, isSecondHand: true, image: "https://images.unsplash.com/photo-1606248897407-99f0976c5432?auto=format&fit=crop&w=300&q=80", description: "Battery Health 87%, Pacific Blue, Genuine Box." },
+    { id: "s4", hubId: "secondhand", name: "Bajaj Pulsar 220F", price: 135000, rating: 4.1, reviews: 10, seller: "Ram Kumar", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1595188602693-47cb2320b923?auto=format&fit=crop&w=300&q=80", description: "2018 Model, Urgent Sale, Tax Cleared." },
+    { id: "s5", hubId: "secondhand", name: "Sony A7III Body Only", price: 140000, rating: 4.8, reviews: 3, seller: "Cameraman Hari", stock: 1, isSecondHand: true, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80", description: "Shutter Count 25k, Minor Scratches, Working Perfect." },
+    { id: "s6", hubId: "secondhand", name: "PlayStation 4 Slim (1TB)", price: 22000, rating: 4.6, reviews: 12, seller: "Gamer Zone", stock: 3, isSecondHand: true, image: "https://images.unsplash.com/photo-1507457379470-08b800bebc67?auto=format&fit=crop&w=300&q=80", description: "Jailbroken 9.00, 1 Controller, 10 Games loaded." },
+    { id: "s7", hubId: "secondhand", name: "Office Table & Chair", price: 8500, rating: 4.0, reviews: 1, seller: "Office Liquidation", stock: 5, isSecondHand: true, image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=300&q=80", description: "Wooden top table and revolving chair, slightly used." },
     
-    // Product Hub (General Gadgets)
-    { id: "p1", hubId: "products", name: "Sony WH-1000XM5", price: 45000, rating: 4.9, reviews: 300, seller: "Sony Nepal", stock: 30, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?auto=format&fit=crop&w=300&q=80" },
-    { id: "p2", hubId: "products", name: "Keychron K2 V2", price: 12000, rating: 4.7, reviews: 150, seller: "Backseat Gaming", stock: 40, image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?auto=format&fit=crop&w=300&q=80" },
-    { id: "p3", hubId: "products", name: "Logitech MX Master 3S", price: 16000, rating: 4.8, reviews: 200, seller: "Logitech", stock: 25, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=300&q=80" },
-    { id: "p4", hubId: "products", name: "JBL Flip 6", price: 18000, rating: 4.6, reviews: 100, seller: "JBL Nepal", stock: 50, image: "https://images.unsplash.com/photo-1631557008139-3896582548cb?auto=format&fit=crop&w=300&q=80" },
-    { id: "p5", hubId: "products", name: "GoPro Hero 12", price: 65000, rating: 4.8, reviews: 80, seller: "Camera Shop", stock: 15, image: "https://images.unsplash.com/photo-1565549247690-394cb5c889f8?auto=format&fit=crop&w=300&q=80" },
-    { id: "p6", hubId: "products", name: "Kindle Paperwhite", price: 22000, rating: 4.9, reviews: 300, seller: "Readers Hub", stock: 20, image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80" },
-    { id: "p7", hubId: "products", name: "DJI Mini 3 Pro", price: 110000, rating: 4.9, reviews: 40, seller: "Oliz Store", stock: 8, image: "https://images.unsplash.com/photo-1506947411487-a56738267384?auto=format&fit=crop&w=300&q=80" },
-    { id: "p8", hubId: "products", name: "PlayStation 5 Slim", price: 85000, rating: 5.0, reviews: 150, seller: "Sony Center", stock: 25, image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=300&q=80" },
-    { id: "p9", hubId: "products", name: "Nintendo Switch OLED", price: 50000, rating: 4.7, reviews: 90, seller: "Gamers Point", stock: 15, image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?auto=format&fit=crop&w=300&q=80" },
+    // --- Fashion Hub (Daraz/Local Brand Style) ---
+    { id: "f1", hubId: "fashion", name: "Goldstar Shoes 032", price: 1250, rating: 4.8, reviews: 1500, seller: "Goldstar Official", stock: 200, image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=300&q=80", description: "The Classic Nepali Sneaker. Durable and Comfortable." },
+    { id: "f2", hubId: "fashion", name: "North Face Windcheater (Copy)", price: 1800, rating: 4.3, reviews: 200, seller: "Asan Bazar", stock: 50, image: "https://images.unsplash.com/photo-1605908502146-5c1a82f31a1f?auto=format&fit=crop&w=300&q=80", description: "Waterproof, warm fleece inside, best for bike riding." },
+    { id: "f3", hubId: "fashion", name: "Dhaka Topi (Palpali)", price: 800, rating: 5.0, reviews: 50, seller: "Nepali Craft", stock: 100, image: "https://images.unsplash.com/photo-1585859608039-3c3a0734a34b?auto=format&fit=crop&w=300&q=80", description: "Authentic Palpali Dhaka Topi, pure cotton." },
+    { id: "f4", hubId: "fashion", name: "Ladies Kurta Set", price: 2500, rating: 4.5, reviews: 80, seller: "Bhatbhateni", stock: 30, image: "https://images.unsplash.com/photo-1583391733958-d024443f0388?auto=format&fit=crop&w=300&q=80", description: "Cotton printed Kurta with Suruwal and Shawl." },
+    { id: "f5", hubId: "fashion", name: "Men's Cargo Pants", price: 1500, rating: 4.2, reviews: 120, seller: "Urban Nepal", stock: 60, image: "https://images.unsplash.com/photo-1517438476312-10d79c077509?auto=format&fit=crop&w=300&q=80", description: "6 Pocket Cargo, Stretchable Fabric, Army Green." },
+    { id: "f6", hubId: "fashion", name: "Lehenga for Wedding", price: 15000, rating: 4.9, reviews: 10, seller: "New Road Boutique", stock: 5, image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=300&q=80", description: "Heavy embroidery, Bridal Red, Velvet fabric." },
+    { id: "f7", hubId: "fashion", name: "Caliber Shoes Men", price: 3200, rating: 4.6, reviews: 45, seller: "Caliber Shoes", stock: 25, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80", description: "Made in Nepal, Stylish Sports Running Shoe." },
+    
+    // --- Real Estate (Kathmandu Focused) ---
+    { id: "r1", hubId: "realstate", name: "Land for Sale in Imadol", price: 3500000, rating: 4.5, reviews: 0, seller: "Nepal Land", stock: 1, image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80", description: "4 Aana, Near Krishna Mandir, 13ft road access. Price per Aana." },
+    { id: "r2", hubId: "realstate", name: "House on Sale - Budhanilkantha", price: 35000000, rating: 5.0, reviews: 1, seller: "Ghar Bazaar", stock: 1, image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=300&q=80", description: "2.5 Storey, 5 Aana, Modern Design, Peaceful VIP Area." },
+    { id: "r3", hubId: "realstate", name: "Flat for Rent - New Baneshwor", price: 25000, rating: 4.2, reviews: 0, seller: "Room Finder", stock: 1, image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=300&q=80", description: "2BHK, Ground Floor, Parking Available, For Family." },
+    { id: "r4", hubId: "realstate", name: "Commercial Space - Putalisadak", price: 60000, rating: 4.0, reviews: 0, seller: "City Rentals", stock: 1, image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=300&q=80", description: "500 sqft, 2nd Floor, Prime Location for Consultancy/IT." },
+    { id: "r5", hubId: "realstate", name: "Land in Pokhara (Lakeside)", price: 9000000, rating: 4.8, reviews: 2, seller: "Pokhara Real Estate", stock: 1, image: "https://images.unsplash.com/photo-1597040663442-17793e4e94a9?auto=format&fit=crop&w=300&q=80", description: "Commercial plot near Hotel Barahi, High ROI potential." },
 
-    // Real Estate
-    { id: "r1", hubId: "realstate", name: "Luxury Apartment in KTM", price: 25000000, rating: 5.0, reviews: 2, seller: "City Homes", stock: 1, image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=300&q=80", description: "3BHK, Fully Furnished." },
-    { id: "r2", hubId: "realstate", name: "Commercial Space", price: 50000000, rating: 4.5, reviews: 0, seller: "Biz Plaza", stock: 1, image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=300&q=80", description: "Prime location in Thamel." }
+    // --- Product Hub (Gadgets & Accessories) ---
+    { id: "p1", hubId: "products", name: "Ultima Watch Magic", price: 3599, rating: 4.5, reviews: 500, seller: "Ultima Lifestyle", stock: 100, image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&w=300&q=80", description: "BT Calling, 1.83 Display, Nepali Brand." },
+    { id: "p2", hubId: "products", name: "Boat Airdopes 141", price: 2999, rating: 4.4, reviews: 1000, seller: "TeleTalk", stock: 200, image: "https://images.unsplash.com/photo-1572569028738-411a56103324?auto=format&fit=crop&w=300&q=80", description: "42 Hours Playback, Beast Mode, ENx Technology." },
+    { id: "p3", hubId: "products", name: "Anker Soundcore Life Q30", price: 10999, rating: 4.9, reviews: 150, seller: "Anker Nepal", stock: 20, image: "https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?auto=format&fit=crop&w=300&q=80", description: "Active Noise Cancellation, Hi-Res Audio, 40H Playtime." },
+    { id: "p4", hubId: "products", name: "Redmi Watch 4", price: 14999, rating: 4.7, reviews: 60, seller: "Xiaomi Nepal", stock: 30, image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&w=300&q=80", description: "AMOLED Display, GPS, HyperOS, Aluminum Frame." },
+    { id: "p5", hubId: "products", name: "Samsung T7 Portable SSD (1TB)", price: 16500, rating: 4.9, reviews: 40, seller: "Lion Tech", stock: 15, image: "https://images.unsplash.com/photo-1628557044797-f21a177c37ec?auto=format&fit=crop&w=300&q=80", description: "USB 3.2 Gen 2, Blazing Fast Transfer, Rugged." },
+    { id: "p6", hubId: "products", name: "Logitech G402 Hyperion Fury", price: 4500, rating: 4.8, reviews: 200, seller: "Backseat Gaming", stock: 40, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=300&q=80", description: "Fastest Gaming Mouse, 8 Programmable Buttons." },
+    { id: "p7", hubId: "products", name: "Digicom Router UPS", price: 2500, rating: 4.6, reviews: 300, seller: "Digicom", stock: 80, image: "https://images.unsplash.com/photo-1544197150-b99a580bbcbf?auto=format&fit=crop&w=300&q=80", description: "Keep your WiFi on during load shedding. 4-5 hours backup." },
+    { id: "p8", hubId: "products", name: "Dizo Trimmer Kit", price: 1999, rating: 4.3, reviews: 150, seller: "Dizo Nepal", stock: 60, image: "https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=300&q=80", description: "4-in-1 Grooming Kit, USB C Charging." },
+    { id: "p9", hubId: "products", name: "Yasuda 2L Rice Cooker", price: 3200, rating: 4.5, reviews: 90, seller: "Yasuda", stock: 40, image: "https://images.unsplash.com/photo-1585059895524-72359e06138a?auto=format&fit=crop&w=300&q=80", description: "Double Pot, 2.2 Liters, Durable build." },
+    { id: "p10", hubId: "products", name: "CG 43 inch 4K Smart TV", price: 42000, rating: 4.4, reviews: 30, seller: "CG Digital", stock: 10, image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=300&q=80", description: "Android 11, Voice Remote, Dolby Audio." }
 ];
 
 const INITIAL_VIDEOS: Video[] = [
@@ -172,6 +171,109 @@ const AI_TOOLS = [
 
 const AI_MODEL = "gemini-3-flash-preview";
 
+// --- Sun Shader Definitions ---
+const sunVertexShader = `
+varying vec2 vUv;
+varying vec3 vNormal;
+void main() {
+  vUv = uv;
+  vNormal = normal;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const sunFragmentShader = `
+uniform float time;
+varying vec2 vUv;
+varying vec3 vNormal;
+
+// Simplex 3D Noise (Simplified)
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+float snoise(vec3 v) {
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+
+  // First corner
+  vec3 i  = floor(v + dot(v, C.yyy) );
+  vec3 x0 = v - i + dot(i, C.xxx) ;
+
+  // Other corners
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min( g.xyz, l.zxy );
+  vec3 i2 = max( g.xyz, l.zxy );
+
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+
+  // Permutations
+  i = mod289(i);
+  vec4 p = permute( permute( permute(
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+
+  float n_ = 0.142857142857;
+  vec3  ns = n_ * D.wyz - D.xzx;
+
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_ );
+
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+
+  vec4 b0 = vec4( x.xy, y.xy );
+  vec4 b1 = vec4( x.zw, y.zw );
+
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
+                                dot(p2,x2), dot(p3,x3) ) );
+}
+
+void main() {
+  float noiseVal = snoise(vNormal * 2.5 + time * 0.5);
+  
+  // Color Gradient: Dark Orange -> Bright Yellow -> White
+  vec3 color1 = vec3(0.8, 0.2, 0.0); // Darker base
+  vec3 color2 = vec3(1.0, 0.8, 0.1); // Bright yellow
+  vec3 color3 = vec3(1.0, 1.0, 0.9); // Hot white
+  
+  // Mix colors based on noise
+  vec3 finalColor = mix(color1, color2, noiseVal * 0.5 + 0.5);
+  finalColor = mix(finalColor, color3, pow(max(0.0, noiseVal), 3.0));
+  
+  gl_FragColor = vec4(finalColor, 1.0);
+}
+`;
+
+
 // --- Components ---
 
 function App() {
@@ -186,18 +288,15 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showAutopilot, setShowAutopilot] = useState(false);
+  const [initialHubFilters, setInitialHubFilters] = useState<{sortBy?: string, searchTerm?: string}>({});
   
   // Dynamic Data States
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [videos, setVideos] = useState<Video[]>(INITIAL_VIDEOS);
 
-  // Load Data on Mount (Simulate Supabase)
   useEffect(() => {
     // In a real scenario, this would fetch from Supabase tables
-    // const { data } = await supabase.from('products').select('*');
-    // if (data) setProducts(data);
-    
-    // For now, we stick to state to ensure seamless demo, but Admin Panel will update these states
   }, []);
 
   const addToCart = (product: Product) => {
@@ -238,6 +337,37 @@ function App() {
     setUser({ ...user, wishlist: newWishlist });
   };
 
+  const handleAutopilotCommand = (cmd: string) => {
+      const text = cmd.toLowerCase();
+      let targetHubId = null;
+      let sortBy = "recommended";
+      
+      if (text.includes("laptop") || text.includes("computer")) targetHubId = "laptop";
+      else if (text.includes("mobile") || text.includes("phone")) targetHubId = "mobile";
+      else if (text.includes("fashion") || text.includes("cloth") || text.includes("wear")) targetHubId = "fashion";
+      else if (text.includes("used") || text.includes("second") || text.includes("2nd")) targetHubId = "secondhand";
+      else if (text.includes("video") || text.includes("learn") || text.includes("tutorial")) targetHubId = "video";
+      else if (text.includes("tools") || text.includes("ai")) targetHubId = "tools";
+      else if (text.includes("real") || text.includes("estate") || text.includes("property")) targetHubId = "realstate";
+      else if (text.includes("product") || text.includes("gadget")) targetHubId = "products";
+
+      if (text.includes("cheap") || text.includes("low price") || text.includes("budget")) sortBy = "priceLow";
+      else if (text.includes("expensive") || text.includes("premium") || text.includes("high price")) sortBy = "priceHigh";
+      else if (text.includes("best") || text.includes("rated") || text.includes("popular")) sortBy = "rating";
+
+      if (targetHubId) {
+          const hub = HUBS.find(h => h.id === targetHubId);
+          if (hub) {
+              setInitialHubFilters({ sortBy });
+              setActiveHub(hub);
+              setNavMode('cinematic'); 
+              setShowAutopilot(false);
+          }
+      } else {
+          alert("Autopilot could not identify a valid destination. Try 'Go to Laptop Hub' or 'Find cheap phones'.");
+      }
+  };
+
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   if (showAdmin) {
@@ -255,6 +385,7 @@ function App() {
     <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
       <SolarSystemScene 
         onHubSelect={(hub) => {
+          setInitialHubFilters({}); 
           setActiveHub(hub);
           if(navMode !== 'directory') setNavMode('cinematic'); 
         }} 
@@ -271,14 +402,23 @@ function App() {
           openAuth={() => setShowAuthModal(true)}
           openProfile={() => setShowProfile(true)}
           openAdmin={() => setShowAdmin(true)}
+          toggleAutopilot={() => setShowAutopilot(!showAutopilot)}
         />
       </div>
 
       <NavBar currentMode={navMode} setMode={setNavMode} />
 
+      {showAutopilot && (
+          <AutopilotBar 
+            onCommand={handleAutopilotCommand} 
+            onClose={() => setShowAutopilot(false)} 
+          />
+      )}
+
       {navMode === 'directory' && (
         <DirectoryOverlay 
           onSelect={(hub) => {
+            setInitialHubFilters({});
             setActiveHub(hub);
             setNavMode('cinematic'); 
           }}
@@ -288,10 +428,11 @@ function App() {
       {activeHub && (
         <HubOverlay 
           hub={activeHub} 
-          products={products} // Pass dynamic products
-          videos={videos}     // Pass dynamic videos
+          products={products}
+          videos={videos} 
           onClose={() => setActiveHub(null)}
           onProductClick={(p) => setSelectedProduct(p)}
+          initialFilters={initialHubFilters}
         />
       )}
 
@@ -324,14 +465,42 @@ function App() {
   );
 }
 
-// --- Admin Dashboard ---
+// ... (Other components like AutopilotBar, AdminDashboard, etc. remain unchanged) ...
+// Since I am providing the FULL file content in the XML, I will include all of them below.
+// But to save tokens and avoid repetition of unchanged code blocks if I were a human, I would just change what's needed.
+// However, the instructions require providing the full content of the file if I change it.
+// I will include the full file with all components.
+
+function AutopilotBar({ onCommand, onClose }: { onCommand: (cmd: string) => void, onClose: () => void }) {
+    const [input, setInput] = useState("");
+    return (
+        <div style={{ position: "absolute", top: "80px", left: "50%", transform: "translateX(-50%)", width: "90%", maxWidth: "600px", zIndex: 100, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ background: "rgba(0, 20, 40, 0.9)", border: "1px solid #00f2ff", borderRadius: "12px", padding: "16px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 0 30px rgba(0, 242, 255, 0.3)" }}>
+                <span style={{ fontSize: "1.5rem" }}>🤖</span>
+                <div style={{ flex: 1 }}>
+                    <div style={{ color: "#00f2ff", fontSize: "0.8rem", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Autopilot Command Console</div>
+                    <input 
+                        autoFocus
+                        placeholder="Ex: 'Find me cheap laptop' or 'Go to video hub'" 
+                        value={input} 
+                        onChange={e => setInput(e.target.value)} 
+                        onKeyDown={e => {
+                            if(e.key === 'Enter' && input.trim()) onCommand(input);
+                        }}
+                        style={{ width: "100%", background: "transparent", border: "none", color: "white", fontSize: "1.1rem", outline: "none", fontFamily: "monospace" }} 
+                    />
+                </div>
+                <button onClick={() => input.trim() && onCommand(input)} style={{ background: "#00f2ff", color: "black", border: "none", padding: "8px 16px", borderRadius: "6px", fontWeight: "bold", cursor: "pointer" }}>ENGAGE</button>
+                <button onClick={onClose} style={{ background: "transparent", color: "#666", border: "none", fontSize: "1.2rem", cursor: "pointer", padding: "0 8px" }}>×</button>
+            </div>
+        </div>
+    );
+}
 
 function AdminDashboard({ onClose, products, setProducts, videos, setVideos, currentUser }: any) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
     const [activeTab, setActiveTab] = useState('products');
-    
-    // Mock Users State (In real app, fetch from Supabase users table)
     const [users, setUsers] = useState<User[]>([
         { id: "u1", name: "John Doe", email: "john@example.com", balance: 500, wishlist: [], orders: [] },
         { id: "u2", name: "Jane Smith", email: "jane@example.com", balance: 1200, wishlist: [], orders: [] },
@@ -387,7 +556,6 @@ function AdminUsers({ users, setUsers }: any) {
         const amount = prompt("Enter amount to add ($):");
         if (amount && !isNaN(+amount)) {
             setUsers(users.map((u: User) => u.id === userId ? { ...u, balance: u.balance + (+amount) } : u));
-            // Sync with Supabase here
         }
     };
     const deleteUser = (userId: string) => {
@@ -432,7 +600,6 @@ function AdminProducts({ products, setProducts }: any) {
         }
         setIsEditing(false);
         setCurrentProduct({});
-        // Sync with Supabase: supabase.from('products').upsert(newProd)
     };
 
     const deleteProduct = (id: string) => {
@@ -557,18 +724,17 @@ function AdminSupport() {
     );
 }
 
-// --- Modified Header ---
-
-function Header({ cartCount, openCart, toggleChat, user, openAuth, openProfile, openAdmin }: any) {
+function Header({ cartCount, openCart, toggleChat, user, openAuth, openProfile, openAdmin, toggleAutopilot }: any) {
   return (
     <div className="responsive-header">
       <div className="header-left">
         <h1 style={{ background: "linear-gradient(to right, #00f2ff, #0099ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-          SageX
+          SageX AI Universe
         </h1>
         <p>The Future of Commerce</p>
       </div>
       <div className="header-right">
+        <button className="header-sm-btn" onClick={toggleAutopilot} style={{ background: "rgba(0, 242, 255, 0.15)", border: "1px solid #00f2ff", color: "#00f2ff", fontWeight: 700, boxShadow: "0 0 10px rgba(0, 242, 255, 0.2)" }}>🤖 AUTOPILOT</button>
         <button className="header-sm-btn" onClick={toggleChat} style={{ background: "linear-gradient(135deg, #00f2ff 0%, #0066ff 100%)", border: "none", color: "white", fontWeight: 700, boxShadow: "0 0 10px rgba(0, 102, 255, 0.4)" }}>Ask AI</button>
         <button className="header-sm-btn" onClick={openCart} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "white", gap: "6px", backdropFilter: "blur(10px)" }}>
           <span>🛒</span><span style={{ fontWeight: "bold" }}>({cartCount})</span>
@@ -584,22 +750,18 @@ function Header({ cartCount, openCart, toggleChat, user, openAuth, openProfile, 
   );
 }
 
-// --- Modified Hub Overlay with Pagination ---
-
-function HubOverlay({ hub, onClose, onProductClick, products, videos }: any) {
-  const [searchTerm, setSearchTerm] = useState("");
+function HubOverlay({ hub, onClose, onProductClick, products, videos, initialFilters = {} }: any) {
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm || "");
   const [priceRange, setPriceRange] = useState([0, 500000]);
   const [minRating, setMinRating] = useState(0);
-  const [sortBy, setSortBy] = useState("recommended");
+  const [sortBy, setSortBy] = useState(initialFilters.sortBy || "recommended");
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 8;
   
-  // Reset pagination when filter changes
   useEffect(() => {
       setCurrentPage(1);
   }, [searchTerm, priceRange, minRating, sortBy, hub.id]);
 
-  // Filter logic
   const hubProducts = products.filter((p: Product) => p.hubId === hub.id);
 
   const filteredProducts = hubProducts
@@ -615,7 +777,6 @@ function HubOverlay({ hub, onClose, onProductClick, products, videos }: any) {
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const displayedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
   const hasFlashSale = hub.type === 'shop' && Math.random() > 0.3;
 
   return (
@@ -645,43 +806,37 @@ function HubOverlay({ hub, onClose, onProductClick, products, videos }: any) {
                 <div className="product-grid">
                     {displayedProducts.map((product: Product) => (
                         <div key={product.id} onClick={() => onProductClick(product)} className="product-card">
-                            <div style={{ height: 180, overflow: "hidden", position: "relative" }}>
-                                <img src={product.image} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }} />
+                            <div className="product-card-img-wrapper">
+                                <img src={product.image} alt={product.name} />
                                 {product.isSecondHand && <span style={{ position: "absolute", top: 8, right: 8, background: "#ff8844", color: "black", padding: "2px 8px", borderRadius: 4, fontSize: "0.7rem", fontWeight: "bold" }}>USED</span>}
                                 {product.originalPrice && (<span style={{ position: "absolute", top: 8, left: 8, background: "#ff4444", color: "white", padding: "2px 6px", borderRadius: 4, fontSize: "0.7rem", fontWeight: "bold" }}>-{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%</span>)}
                             </div>
-                            <div style={{ padding: 16, flex: 1, display: "flex", flexDirection: "column" }}>
-                                <h3 style={{ margin: "0 0 4px 0", fontSize: "1rem", fontWeight: 600, height: 44, overflow: "hidden", lineHeight: "1.4" }}>{product.name}</h3>
-                                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.8rem", color: "#fbbf24", marginBottom: 8 }}>
-                                    <span>{"★".repeat(Math.round(product.rating))}</span> <span>({product.reviews})</span>
+                            <div className="product-card-content">
+                                <div>
+                                    <h3 style={{ margin: "0 0 4px 0", fontSize: "1rem", fontWeight: 600, lineHeight: "1.3", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{product.name}</h3>
+                                    <p style={{ margin: 0, fontSize: "0.8rem", color: "#888", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: "1.4" }}>
+                                        {product.description || "Premium quality product with advanced features."}
+                                    </p>
                                 </div>
-                                <div style={{ marginTop: "auto" }}>
-                                    <div style={{ color: "#00f2ff", fontSize: "1.1rem", fontWeight: 700 }}>NPR {product.price.toLocaleString()}</div>
-                                    {product.originalPrice && <div style={{ textDecoration: "line-through", color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>NPR {product.originalPrice.toLocaleString()}</div>}
+                                <div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "0.8rem", color: "#fbbf24", marginBottom: 4 }}>
+                                        <span>{"★".repeat(Math.round(product.rating))}</span> <span style={{color: "#666"}}>({product.reviews})</span>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                                        <span style={{ color: "#00f2ff", fontSize: "1.1rem", fontWeight: 700 }}>NPR {product.price.toLocaleString()}</span>
+                                        {product.originalPrice && <span style={{ textDecoration: "line-through", color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>{product.originalPrice.toLocaleString()}</span>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* Pagination Controls */}
                 {filteredProducts.length > ITEMS_PER_PAGE && (
                     <div className="pagination-container">
-                        <button 
-                            className="pagination-btn" 
-                            disabled={currentPage === 1} 
-                            onClick={() => setCurrentPage(p => p - 1)}
-                        >
-                            Previous
-                        </button>
+                        <button className="pagination-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>Previous</button>
                         <span className="pagination-info">Page {currentPage} of {totalPages}</span>
-                        <button 
-                            className="pagination-btn" 
-                            disabled={currentPage === totalPages} 
-                            onClick={() => setCurrentPage(p => p + 1)}
-                        >
-                            Next
-                        </button>
+                        <button className="pagination-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Next</button>
                     </div>
                 )}
                 </>
@@ -715,9 +870,6 @@ function HubOverlay({ hub, onClose, onProductClick, products, videos }: any) {
     </div>
   );
 }
-
-// ... Reusing other components (NavBar, DirectoryOverlay, ProductDetailsModal, CheckoutModal, AuthModal, CartDrawer, ChatInterface, SolarSystemScene, Joystick) unchanged ...
-// NOTE: I am keeping them exactly as is, but referencing them below to ensure they are included in the file.
 
 function NavBar({ currentMode, setMode }: any) {
     return <div className="nav-bar"><button className={`nav-item ${currentMode === 'pilot' ? 'active' : ''}`} onClick={() => setMode('pilot')}>🚀 Pilot</button><button className={`nav-item ${currentMode === 'cinematic' ? 'active' : ''}`} onClick={() => setMode('cinematic')}>🎥 Cinematic</button><button className={`nav-item ${currentMode === 'directory' ? 'active' : ''}`} onClick={() => setMode('directory')}>📂 Directory</button></div>;
@@ -755,7 +907,7 @@ function CheckoutModal({ cart, total, onClose, onPlaceOrder, user }: any) {
 
 function AuthModal({ onLogin, onClose }: any) {
   const [isRegister, setIsRegister] = useState(false); const [name, setName] = useState(""); const [email, setEmail] = useState("");
-  return <div className="modal-overlay"><div className="modal-content-responsive" style={{ maxWidth: 400 }}><h2 style={{ textAlign: "center", marginBottom: 30, color: "white" }}>{isRegister ? "Create Account" : "Welcome Back"}</h2>{isRegister && <input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} />}<input placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><input type="password" placeholder="Password" style={{ width: "100%", padding: 12, marginBottom: 24, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><button onClick={() => onLogin(email, name || "User")} style={{ width: "100%", padding: 14, background: "#00f2ff", border: "none", borderRadius: 8, fontWeight: "bold", cursor: "pointer", marginBottom: 16 }}>{isRegister ? "Sign Up" : "Login"}</button><div style={{ textAlign: "center", fontSize: "0.9rem", color: "#888", cursor: "pointer" }} onClick={() => setIsRegister(!isRegister)}>{isRegister ? "Already have an account? Login" : "New to SageX? Register"}</div><button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "#666", fontSize: "1.5rem", cursor: "pointer" }}>×</button></div></div>;
+  return <div className="modal-overlay"><div className="modal-content-responsive" style={{ maxWidth: 400 }}><h2 style={{ textAlign: "center", marginBottom: 30, color: "white" }}>{isRegister ? "Create Account" : "Welcome Back"}</h2>{isRegister && <input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} />}<input placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><input type="password" placeholder="Password" style={{ width: "100%", padding: 12, marginBottom: 24, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><button onClick={() => onLogin(email, name || "User")} style={{ width: "100%", padding: 14, background: "#00f2ff", border: "none", borderRadius: 8, fontWeight: "bold", cursor: "pointer", marginBottom: 16 }}>{isRegister ? "Sign Up" : "Login"}</button><div style={{ textAlign: "center", fontSize: "0.9rem", color: "#888", cursor: "pointer" }} onClick={() => setIsRegister(!isRegister)}>{isRegister ? "Already have an account? Login" : "New to SageX? Register"}</div><button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "666", fontSize: "1.5rem", cursor: "pointer" }}>×</button></div></div>;
 }
 
 function ProfileModal({ user, onClose }: any) {
@@ -777,7 +929,25 @@ function ChatInterface({ activeHub, onClose }: { activeHub: HubData | null, onCl
 function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: HubData) => void, isPaused: boolean, mode: NavMode }) {
   const mountRef = useRef<HTMLDivElement>(null);
   const simState = useRef({ isPaused, mode });
-  const hubsRef = useRef<{ mesh: THREE.Mesh, data: HubData, angle: number, labelDiv?: HTMLDivElement }[]>([]);
+  
+  // Warp State tracking
+  const warpRef = useRef({
+      active: false,
+      target: new THREE.Vector3(),
+      startTime: 0,
+      duration: 1.5,
+      startPos: new THREE.Vector3(),
+      startLookAt: new THREE.Vector3(),
+      hub: null as HubData | null
+  });
+
+  const hubsRef = useRef<{ 
+      mesh: THREE.Mesh, 
+      data: HubData, 
+      angle: number, 
+      labelDiv?: HTMLDivElement
+  }[]>([]);
+
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const moveState = useRef({ 
@@ -815,20 +985,29 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
 
   useEffect(() => {
     if (!mountRef.current) return;
+    
+    // PERFORMANCE & DEVICE DETECTION
+    const isLowEnd = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
     const scene = new THREE.Scene(); 
     scene.background = new THREE.Color(0x020205); 
-    scene.fog = new THREE.FogExp2(0x020205, 0.001); // Thinner fog for vastness
+    scene.fog = new THREE.FogExp2(0x020205, 0.002); 
     
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000); 
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1500); 
     cameraRef.current = camera;
+    camera.rotation.order = 'YXZ';
     
-    // Fit perfectly: Move camera back on mobile
-    const isMobile = window.innerWidth < 768; 
-    camera.position.set(0, isMobile ? 140 : 100, isMobile ? 260 : 180);
+    // Position camera further back on mobile for better framing
+    camera.position.set(0, isLowEnd ? 160 : 100, isLowEnd ? 300 : 180);
     
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: !isLowEnd, // Disable AA on mobile/low-end
+        alpha: false, // Opaque is faster
+        powerPreference: "high-performance",
+        precision: isLowEnd ? "mediump" : "highp" // Lower precision for speed
+    }); 
     renderer.setSize(window.innerWidth, window.innerHeight); 
-    renderer.setPixelRatio(window.devicePixelRatio); 
+    renderer.setPixelRatio(isLowEnd ? 1 : Math.min(window.devicePixelRatio, 1.5)); // Limit pixel ratio
     mountRef.current.appendChild(renderer.domElement);
     
     const labelContainer = document.createElement('div'); 
@@ -842,167 +1021,228 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     orbitControls.autoRotate = true; orbitControls.autoRotateSpeed = 0.5; 
     controlsRef.current = orbitControls;
     
-    const pointerLock = new PointerLockControls(camera, document.body); 
-    pointerLock.addEventListener('lock', () => setIsLocked(true)); 
-    pointerLock.addEventListener('unlock', () => setIsLocked(false));
+    const onMouseMove = (event: MouseEvent) => {
+        if (document.pointerLockElement === document.body) {
+             camera.rotation.y -= event.movementX * 0.002;
+             camera.rotation.x -= event.movementY * 0.002;
+             camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+        }
+    };
+    const onPointerLockChange = () => {
+        setIsLocked(document.pointerLockElement === document.body);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('pointerlockchange', onPointerLockChange);
     
-    // Improved Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 3); // Brighter ambient
+    // LIGHTING
+    const ambientLight = new THREE.AmbientLight(0x404040, 2); 
     scene.add(ambientLight);
     
-    // Sun
-    const coreGeo = new THREE.SphereGeometry(10, 64, 64); 
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Bright white core
+    // Only one point light for the sun
+    const coreLight = new THREE.PointLight(0xffaa00, 3, 400); 
+    scene.add(coreLight);
+    
+    // GEOMETRY OPTIMIZATION
+    const segs = isLowEnd ? 32 : 64; 
+
+    // --- NEW SUN SHADER ---
+    const coreGeo = new THREE.SphereGeometry(10, segs, segs); 
+    const coreMat = new THREE.ShaderMaterial({
+        vertexShader: sunVertexShader,
+        fragmentShader: sunFragmentShader,
+        uniforms: {
+            time: { value: 0 }
+        }
+    });
     const core = new THREE.Mesh(coreGeo, coreMat); 
     scene.add(core);
 
-    // Sun Inner Glow (Bright Cyan)
-    const glowGeo = new THREE.SphereGeometry(12, 64, 64); 
-    const glowMat = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.5 }); 
+    const glowGeo = new THREE.SphereGeometry(12, segs, segs); 
+    const glowMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.3 }); 
     const glow = new THREE.Mesh(glowGeo, glowMat); 
     scene.add(glow);
     
-    // Sun Outer Halo (Faint Blue)
-    const haloGeo = new THREE.SphereGeometry(16, 64, 64); 
-    const haloMat = new THREE.MeshBasicMaterial({ color: 0x0055ff, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending }); 
+    // Outer Halo
+    const haloGeo = new THREE.SphereGeometry(16, segs, segs); 
+    const haloMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending }); 
     const halo = new THREE.Mesh(haloGeo, haloMat); 
     scene.add(halo);
 
-    const coreLight = new THREE.PointLight(0x00f2ff, 5, 500); 
-    scene.add(coreLight);
-    
-    // Enhanced Star Field
+    // STARS
     const starsGeo = new THREE.BufferGeometry(); 
-    const starsCnt = 8000; 
+    const starsCnt = isLowEnd ? 800 : 3000; // Drastic reduction for mobile
     const posArray = new Float32Array(starsCnt * 3); 
     const colorsArray = new Float32Array(starsCnt * 3);
     for(let i=0; i<starsCnt*3; i+=3) { 
-        posArray[i] = (Math.random() - 0.5) * 1500; 
-        posArray[i+1] = (Math.random() - 0.5) * 1500;
-        posArray[i+2] = (Math.random() - 0.5) * 1500;
+        posArray[i] = (Math.random() - 0.5) * 1200; 
+        posArray[i+1] = (Math.random() - 0.5) * 1200;
+        posArray[i+2] = (Math.random() - 0.5) * 1200;
         
-        // Random star colors (white, blueish, reddish)
-        const colorType = Math.random();
-        if(colorType > 0.9) { colorsArray[i]=1; colorsArray[i+1]=0.8; colorsArray[i+2]=0.8; } // Reddish
-        else if(colorType > 0.7) { colorsArray[i]=0.8; colorsArray[i+1]=0.8; colorsArray[i+2]=1; } // Blueish
-        else { colorsArray[i]=1; colorsArray[i+1]=1; colorsArray[i+2]=1; } // White
+        const c = 0.8 + Math.random() * 0.2;
+        colorsArray[i] = c; colorsArray[i+1] = c; colorsArray[i+2] = c;
     } 
     starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3)); 
     starsGeo.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
-    const starsMat = new THREE.PointsMaterial({size: 0.8, vertexColors: true, transparent: true, opacity: 0.8}); 
+    const starsMat = new THREE.PointsMaterial({size: isLowEnd ? 1.5 : 0.8, vertexColors: true, sizeAttenuation: true}); 
     const starMesh = new THREE.Points(starsGeo, starsMat); 
     scene.add(starMesh);
     
-    // --- COMET IMPLEMENTATION ---
+    // WARP SPEED LINES (Initially Invisible)
+    const warpGeo = new THREE.BufferGeometry();
+    const warpCount = 1000;
+    const warpPos = new Float32Array(warpCount * 3);
+    for(let i=0; i<warpCount*3; i+=3) {
+        warpPos[i] = (Math.random() - 0.5) * 400;
+        warpPos[i+1] = (Math.random() - 0.5) * 400;
+        warpPos[i+2] = (Math.random() - 0.5) * 400;
+    }
+    warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
+    const warpMat = new THREE.PointsMaterial({ color: 0x00ffff, size: 2, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
+    const warpMesh = new THREE.Points(warpGeo, warpMat);
+    scene.add(warpMesh);
+
+    // COMET
     const cometGroup = new THREE.Group();
     scene.add(cometGroup);
 
-    // Comet Head
     const cometHead = new THREE.Mesh(
-        new THREE.SphereGeometry(0.8, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0x00ffff }) // Cyan
+        new THREE.SphereGeometry(0.8, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0x00ffff }) 
     );
     cometGroup.add(cometHead);
 
-    // Comet Glow
-    const cometGlow = new THREE.Mesh(
-        new THREE.SphereGeometry(1.5, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.3 })
-    );
-    cometGroup.add(cometGlow);
-
-    // Comet Tail (Particles)
-    const tailParticleCount = 300;
+    const tailParticleCount = isLowEnd ? 50 : 150;
     const tailGeo = new THREE.BufferGeometry();
     const tailPos = new Float32Array(tailParticleCount * 3);
     for(let i=0; i<tailParticleCount*3; i++) tailPos[i] = 0;
     tailGeo.setAttribute('position', new THREE.BufferAttribute(tailPos, 3));
     const tailMat = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.5, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
     const tailPoints = new THREE.Points(tailGeo, tailMat);
-    scene.add(tailPoints); // Add to scene to handle world trails
+    scene.add(tailPoints);
 
-    // --- UFO FLEET IMPLEMENTATION ---
+    // UFOS - Disable on low-end
     const ufoGroup = new THREE.Group();
-    scene.add(ufoGroup);
     const ufos: any[] = [];
-    
-    const createUFO = (type: 'saucer' | 'rocket') => {
-        const ufo = new THREE.Group();
-        if (type === 'saucer') {
-            const body = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16).scale(1, 0.3, 1), new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.8, roughness: 0.2 }));
-            const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16).translate(0, 0.2, 0), new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.8 }));
-            const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.1, 8, 32).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({ color: 0xff00ff }));
-            ufo.add(body, dome, ring);
-        } else {
-             const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2, 16), new THREE.MeshStandardMaterial({ color: 0xff4444, metalness: 0.5 }));
-             const nose = new THREE.Mesh(new THREE.ConeGeometry(0.3, 1, 16).translate(0, 1.5, 0), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-             const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.2, 0.5, 16).translate(0, -1.2, 0), new THREE.MeshBasicMaterial({ color: 0xffaa00 }));
-             body.rotation.x = Math.PI / 2; nose.rotation.x = Math.PI / 2; engine.rotation.x = Math.PI / 2;
-             ufo.add(body, nose, engine);
-        }
-        return ufo;
-    };
+    if (!isLowEnd) {
+        scene.add(ufoGroup);
+        const createUFO = (type: 'saucer' | 'rocket') => {
+            const ufo = new THREE.Group();
+            if (type === 'saucer') {
+                const body = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16).scale(1, 0.3, 1), new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
+                const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16).translate(0, 0.2, 0), new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.8 }));
+                ufo.add(body, dome);
+            } else {
+                 const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2, 8), new THREE.MeshLambertMaterial({ color: 0xff4444 }));
+                 body.rotation.x = Math.PI / 2;
+                 ufo.add(body);
+            }
+            return ufo;
+        };
 
-    for(let i=0; i<20; i++) {
-        const type = Math.random() > 0.5 ? 'saucer' : 'rocket';
-        const ufo = createUFO(type);
-        const dist = 50 + Math.random() * 120;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = (0.002 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1);
-        const yOffset = (Math.random() - 0.5) * 40;
-        
-        ufo.position.set(Math.cos(angle)*dist, yOffset, Math.sin(angle)*dist);
-        ufo.rotation.y = angle + Math.PI/2; // Face forward
-        
-        ufoGroup.add(ufo);
-        ufos.push({ mesh: ufo, dist, angle, speed, yOffset, type });
+        for(let i=0; i<8; i++) { 
+            const type = Math.random() > 0.5 ? 'saucer' : 'rocket';
+            const ufo = createUFO(type);
+            const dist = 50 + Math.random() * 120;
+            const angle = Math.random() * Math.PI * 2;
+            const speed = (0.002 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1);
+            const yOffset = (Math.random() - 0.5) * 40;
+            
+            ufo.position.set(Math.cos(angle)*dist, yOffset, Math.sin(angle)*dist);
+            ufo.rotation.y = angle + Math.PI/2;
+            ufoGroup.add(ufo);
+            ufos.push({ mesh: ufo, dist, angle, speed, yOffset, type });
+        }
     }
 
     hubsRef.current = [];
-    HUBS.forEach(h => {
-        // Planets: Better Materials for "Realistic" feel
-        const geo = new THREE.SphereGeometry(h.radius, 64, 64); 
-        const mat = new THREE.MeshStandardMaterial({ 
-            color: h.color, 
-            roughness: 0.4, 
-            metalness: 0.6,
-            emissive: h.color, 
-            emissiveIntensity: 0.1 
-        }); 
+    HUBS.forEach((h, i) => {
+        const geo = new THREE.SphereGeometry(h.radius, segs, segs); 
+        const mat = new THREE.MeshLambertMaterial({ color: h.color }); 
         const mesh = new THREE.Mesh(geo, mat);
         
-        // Rings
         if (h.hasRing) { 
-            const ringGeo = new THREE.RingGeometry(h.radius * 1.5, h.radius * 2.2, 64); 
-            const ringMat = new THREE.MeshStandardMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5, metalness: 0.8, roughness: 0.2 }); 
+            const ringGeo = new THREE.RingGeometry(h.radius * 1.5, h.radius * 2.2, 32); 
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }); 
             const ring = new THREE.Mesh(ringGeo, ringMat); 
             ring.rotation.x = -Math.PI / 2; 
-            ring.rotation.y = Math.PI / 6; // Tilt ring
+            ring.rotation.y = Math.PI / 6; 
             mesh.add(ring); 
         }
         scene.add(mesh);
         
-        // Orbit Lines (Smoother)
-        const orbitCurve = new THREE.EllipseCurve(0, 0, h.distance, h.distance, 0, 2*Math.PI, false, 0); 
-        const points = orbitCurve.getPoints(128); 
-        const orbitGeo = new THREE.BufferGeometry().setFromPoints(points); 
-        const orbitMat = new THREE.LineBasicMaterial({ color: h.color, transparent: true, opacity: 0.15 }); 
-        const orbitLine = new THREE.Line(orbitGeo, orbitMat); 
-        orbitLine.rotation.x = -Math.PI / 2; 
+        // --- Reverted to Simple Circular Orbits ---
+        // Create a visual ring for the orbit path
+        const orbitGeo = new THREE.RingGeometry(h.distance - 0.15, h.distance + 0.15, isLowEnd ? 64 : 128); 
+        const orbitMat = new THREE.MeshBasicMaterial({ color: h.color, side: THREE.DoubleSide, transparent: true, opacity: 0.15 }); 
+        const orbitLine = new THREE.Mesh(orbitGeo, orbitMat); 
+        orbitLine.rotation.x = -Math.PI / 2; // Lay flat on XZ plane
         scene.add(orbitLine);
         
-        const label = document.createElement('div'); label.className = 'planet-label'; label.innerHTML = `<span style="font-size:1.2em; margin-right:4px;">${h.icon}</span> ${h.name}`; label.onclick = () => onHubSelect(h); labelContainer.appendChild(label);
-        hubsRef.current.push({ mesh, data: h, angle: Math.random() * Math.PI * 2, labelDiv: label });
+        const label = document.createElement('div'); label.className = 'planet-label'; label.innerHTML = `<span style="font-size:1.2em; margin-right:4px;">${h.icon}</span> ${h.name}`; 
+        
+        // Intercept click for Warp
+        label.onclick = () => {
+             // START WARP
+            if (warpRef.current.active) return;
+            warpRef.current.active = true;
+            warpRef.current.startTime = clock.getElapsedTime();
+            warpRef.current.startPos.copy(camera.position);
+            
+            // Calculate target position (in front of the planet)
+            const planetPos = new THREE.Vector3().copy(mesh.position);
+            const direction = new THREE.Vector3().subVectors(camera.position, planetPos).normalize();
+            // Stop 10 units away
+            warpRef.current.target.copy(planetPos).add(direction.multiplyScalar(10));
+            warpRef.current.hub = h;
+            
+            // Look at planet
+            controlsRef.current.enabled = false;
+        };
+        
+        labelContainer.appendChild(label);
+        
+        hubsRef.current.push({ 
+            mesh, 
+            data: h, 
+            angle: Math.random() * Math.PI * 2, 
+            labelDiv: label
+        });
     });
     
     const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
-    const onClick = (e: MouseEvent) => { if (simState.current.mode === 'pilot' && !isMobile) { if (!pointerLock.isLocked) pointerLock.lock(); return; } if ((e.target as HTMLElement).closest('.planet-label')) return; mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; raycaster.setFromCamera(mouse, camera); const intersects = raycaster.intersectObjects(hubsRef.current.map(o => o.mesh)); if (intersects.length > 0) { const hit = hubsRef.current.find(h => h.mesh === intersects[0].object); if (hit) onHubSelect(hit.data); } };
+    const onClick = (e: MouseEvent) => { 
+        if (simState.current.mode === 'pilot' && !isLowEnd) { 
+            if (document.pointerLockElement !== document.body) {
+                document.body.requestPointerLock(); 
+            }
+            return; 
+        } 
+        if ((e.target as HTMLElement).closest('.planet-label')) return; 
+        
+        // Handle raycast click on mesh
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1; 
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; 
+        raycaster.setFromCamera(mouse, camera); 
+        const intersects = raycaster.intersectObjects(hubsRef.current.map(o => o.mesh)); 
+        if (intersects.length > 0) { 
+            const hit = hubsRef.current.find(h => h.mesh === intersects[0].object); 
+            if (hit && !warpRef.current.active) {
+                // Trigger Warp Logic (Duplicate of label logic)
+                warpRef.current.active = true;
+                warpRef.current.startTime = clock.getElapsedTime();
+                warpRef.current.startPos.copy(camera.position);
+                const planetPos = new THREE.Vector3().copy(hit.mesh.position);
+                const direction = new THREE.Vector3().subVectors(camera.position, planetPos).normalize();
+                warpRef.current.target.copy(planetPos).add(direction.multiplyScalar(10));
+                warpRef.current.hub = hit.data;
+                controlsRef.current.enabled = false;
+            } 
+        } 
+    };
     renderer.domElement.addEventListener('click', onClick);
     
-    // Joystick handler updates velocity vector for analog control
     (window as any).joystickMove = (dx: number, dy: number) => { 
         moveState.current.joyVector.set(dx, dy);
-        // Fallback boolean logic for consistency
         moveState.current.left = dx < -0.3; 
         moveState.current.right = dx > 0.3; 
         moveState.current.forward = dy < -0.3; 
@@ -1011,14 +1251,59 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     (window as any).joystickLook = (dx: number, dy: number) => { moveState.current.rotY = -dx * 0.03; moveState.current.rotX = -dy * 0.03; };
     
     let animationId: number; const tempV = new THREE.Vector3(); const clock = new THREE.Clock();
+    
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let frame = 0;
+
     const animate = () => {
         animationId = requestAnimationFrame(animate); 
+        frame++;
         const delta = clock.getDelta(); 
         const elapsedTime = clock.getElapsedTime();
         const { isPaused, mode } = simState.current;
         
-        if (mode === 'cinematic' && orbitControls) { 
-            // Cinematic: Manual override via joystick on mobile
+        // Update Sun Shader
+        coreMat.uniforms.time.value = elapsedTime;
+
+        // WARP LOGIC
+        if (warpRef.current.active) {
+            const t = (elapsedTime - warpRef.current.startTime) / warpRef.current.duration;
+            const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // Ease in out cubic
+
+            if (t < 1.0) {
+                // Move Camera
+                camera.position.lerpVectors(warpRef.current.startPos, warpRef.current.target, easeT);
+                camera.lookAt(warpRef.current.hub ? hubsRef.current.find(h => h.data.id === warpRef.current.hub!.id)!.mesh.position : new THREE.Vector3());
+                
+                // Warp Effect (FOV and Lines)
+                // Peak warp at t=0.5
+                const warpIntensity = Math.sin(t * Math.PI); 
+                camera.fov = 45 + (warpIntensity * 30); 
+                camera.updateProjectionMatrix();
+
+                warpMat.opacity = warpIntensity * 0.8;
+                
+                // Animate warp lines (move towards camera)
+                const positions = warpMesh.geometry.attributes.position.array as Float32Array;
+                for(let i=2; i<positions.length; i+=3) {
+                    positions[i] += 50 * warpIntensity;
+                    if(positions[i] > 200) positions[i] -= 400;
+                }
+                warpMesh.geometry.attributes.position.needsUpdate = true;
+
+            } else {
+                // End Warp
+                warpRef.current.active = false;
+                camera.fov = 45;
+                camera.updateProjectionMatrix();
+                warpMat.opacity = 0;
+                if (warpRef.current.hub) onHubSelect(warpRef.current.hub);
+                controlsRef.current.enabled = true;
+            }
+        }
+        
+        if (mode === 'cinematic' && orbitControls && !warpRef.current.active) { 
             if (moveState.current.rotX !== 0 || moveState.current.rotY !== 0) {
                  orbitControls.autoRotate = false;
                  orbitControls.azimuthAngle -= moveState.current.rotY * 0.05;
@@ -1029,11 +1314,10 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
             orbitControls.enabled = true; 
             orbitControls.update(); 
         }
-        else if (mode === 'pilot') {
+        else if (mode === 'pilot' && !warpRef.current.active) {
              if (orbitControls) orbitControls.enabled = false;
              const speed = 50 * delta; const velocity = new THREE.Vector3();
              
-             // Keyboard Input
              if (moveState.current.forward) velocity.z -= speed; 
              if (moveState.current.backward) velocity.z += speed; 
              if (moveState.current.left) velocity.x -= speed; 
@@ -1041,116 +1325,103 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
              if (moveState.current.up) velocity.y += speed; 
              if (moveState.current.down) velocity.y -= speed;
              
-             // Analog Joystick Input (Touch Fix)
              const joy = moveState.current.joyVector;
              if (joy.lengthSq() > 0.01) {
-                 // Push velocity based on joystick direction relative to camera view is tricky without heavy math,
-                 // but basic 'forward/back' works nicely if we treat Z as forward.
-                 // NOTE: Joystick Y is negative for Up (Forward) usually.
                  velocity.x += joy.x * speed; 
                  velocity.z += joy.y * speed; 
              }
 
-             // Apply movement
              camera.translateX(velocity.x); 
              camera.translateZ(velocity.z); 
              camera.translateY(velocity.y); 
              
              camera.rotateY(moveState.current.rotY); 
              camera.rotateX(moveState.current.rotX); 
-             // Smooth damping for joystick look
              moveState.current.rotX *= 0.85; 
              moveState.current.rotY *= 0.85; 
              
-             // Ensure camera stays level-ish
              camera.rotation.z = 0; 
         } 
         else if (mode === 'directory' && orbitControls) { 
             orbitControls.autoRotate = true; orbitControls.autoRotateSpeed = 0.2; orbitControls.update(); 
         }
         
-        if (!isPaused) {
+        if (!isPaused && !warpRef.current.active) { // Pause simulation during warp
             hubsRef.current.forEach(h => { 
-                h.angle += h.data.speed * 0.5; 
-                h.mesh.position.x = Math.cos(h.angle) * h.data.distance; 
-                h.mesh.position.z = Math.sin(h.angle) * h.data.distance; 
+                h.angle += h.data.speed * 0.5; // Constant, smooth speed
+                h.mesh.position.x = Math.cos(h.angle) * h.data.distance;
+                h.mesh.position.z = Math.sin(h.angle) * h.data.distance;
+                h.mesh.position.y = 0; 
                 h.mesh.rotation.y += 0.005; 
             });
             core.rotation.y += 0.002; 
             starMesh.rotation.y -= 0.0001; 
 
-            // Comet Animation
+            // Comet Logic (Simplified)
             const cometDist = 160;
             const cometAngle = elapsedTime * 0.3;
-            // Elliptical orbit
             const cX = Math.cos(cometAngle) * cometDist * 1.8;
             const cZ = Math.sin(cometAngle) * cometDist * 0.8;
             const cY = Math.sin(cometAngle * 2) * 20;
             
             cometGroup.position.set(cX, cY, cZ);
-            cometGroup.rotation.y = Math.atan2( -cZ, -cX ) + Math.PI; // Tail points away from center approximately
+            cometGroup.rotation.y = Math.atan2( -cZ, -cX ) + Math.PI; 
 
-            // Update Tail Particles
             const positions = (tailPoints.geometry.attributes.position as THREE.BufferAttribute).array as Float32Array;
-            for(let i = tailParticleCount - 1; i > 0; i--) {
-                positions[i*3] = positions[(i-1)*3] + (Math.random()-0.5)*0.5;
-                positions[i*3+1] = positions[(i-1)*3+1] + (Math.random()-0.5)*0.5;
-                positions[i*3+2] = positions[(i-1)*3+2] + (Math.random()-0.5)*0.5;
-            }
-            // Head position (World Space trick) - actually simplest is to make tail trailing in local space but move them back
-            // Better visual trick: Just jitter them in local space behind the head
-            for(let i=0; i<tailParticleCount; i++) {
-                // Shift particles back along local Z (assuming tail points +Z)
-                // Actually easier to just re-generate them at head and move them "back"
-                // Let's use world space positions for trails in a more complex setup, 
-                // but for this simple loop, let's just make a static fuzzy tail that rotates with the group.
-                // Reset random points to simulate flow
-                if (Math.random() > 0.9) {
-                     positions[i*3] = (Math.random() - 0.5) * 0.5;
-                     positions[i*3+1] = (Math.random() - 0.5) * 0.5;
-                     positions[i*3+2] = 0; // At head
-                } else {
-                     positions[i*3+2] += 0.5; // Move away from head
-                     positions[i*3] += (Math.random()-0.5) * 0.1; // Spread
-                     positions[i*3+1] += (Math.random()-0.5) * 0.1;
+            // Simplified particle update
+            if (frame % 2 === 0) { 
+                for(let i = tailParticleCount - 1; i > 0; i--) {
+                    positions[i*3] = positions[(i-1)*3] + (Math.random()-0.5)*0.5;
+                    positions[i*3+1] = positions[(i-1)*3+1] + (Math.random()-0.5)*0.5;
+                    positions[i*3+2] = positions[(i-1)*3+2] + (Math.random()-0.5)*0.5;
                 }
+                for(let i=0; i<tailParticleCount; i++) {
+                     if (Math.random() > 0.9) {
+                         positions[i*3] = (Math.random() - 0.5) * 0.5;
+                         positions[i*3+1] = (Math.random() - 0.5) * 0.5;
+                         positions[i*3+2] = 0; 
+                    } else {
+                         positions[i*3+2] += 0.5; 
+                         positions[i*3] += (Math.random()-0.5) * 0.1;
+                         positions[i*3+1] += (Math.random()-0.5) * 0.1;
+                    }
+                }
+                tailPoints.geometry.attributes.position.needsUpdate = true;
             }
-            tailPoints.geometry.attributes.position.needsUpdate = true;
-            // Rotate tail points to point away from sun (0,0,0)
-            const dirToSun = new THREE.Vector3().subVectors(new THREE.Vector3(0,0,0), cometGroup.position).normalize();
-            // Actually, tail points away from sun.
-            cometGroup.lookAt(0,0,0); // +Z looks at sun? No lookAt makes +Z look at target.
-            // If +Z looks at sun, particles moving +Z go towards sun. We want them moving -Z (away) or just rotate group 180.
             
             // UFO Animation
-            ufos.forEach(u => {
-                u.angle += u.speed;
-                u.mesh.position.x = Math.cos(u.angle) * u.dist;
-                u.mesh.position.y = u.yOffset + Math.sin(elapsedTime + u.dist) * 2;
-                u.mesh.position.z = Math.sin(u.angle) * u.dist;
-                u.mesh.rotation.y = -u.angle; // Face direction of travel
-                if (u.type === 'saucer') u.mesh.rotation.z = Math.sin(elapsedTime * 3) * 0.2; // Wobble
-            });
+            if (!isLowEnd) {
+                ufos.forEach(u => {
+                    u.angle += u.speed;
+                    u.mesh.position.x = Math.cos(u.angle) * u.dist;
+                    u.mesh.position.y = u.yOffset + Math.sin(elapsedTime + u.dist) * 2;
+                    u.mesh.position.z = Math.sin(u.angle) * u.dist;
+                    u.mesh.rotation.y = -u.angle; 
+                });
+            }
         }
 
-        // Label Positioning
-        hubsRef.current.forEach(h => { 
-            if (h.labelDiv && h.mesh) { 
-                h.mesh.updateWorldMatrix(true, false); 
-                h.mesh.getWorldPosition(tempV); 
-                tempV.project(camera); 
-                const x = (tempV.x * .5 + .5) * mountRef.current!.clientWidth; 
-                const y = (tempV.y * -.5 + .5) * mountRef.current!.clientHeight; 
-                // Hide labels if behind camera
-                if (tempV.z < 1 && tempV.z > -1) { 
-                    h.labelDiv.style.display = 'block'; 
-                    h.labelDiv.style.left = `${x}px`; 
-                    h.labelDiv.style.top = `${y - 40}px`; 
-                } else { 
-                    h.labelDiv.style.display = 'none'; 
+        // Label Positioning 
+        if (frame % 3 === 0 && !warpRef.current.active) {
+            hubsRef.current.forEach(h => { 
+                if (h.labelDiv && h.mesh) { 
+                    h.mesh.getWorldPosition(tempV); 
+                    tempV.project(camera); 
+                    
+                    if (tempV.z < 1 && tempV.z > -1) { 
+                        const x = (tempV.x * .5 + .5) * width; 
+                        const y = (tempV.y * -.5 + .5) * height; 
+                        h.labelDiv.style.display = 'block'; 
+                        h.labelDiv.style.transform = `translate3d(${x.toFixed(1)}px, ${(y - 40).toFixed(1)}px, 0)`;
+                    } else { 
+                        h.labelDiv.style.display = 'none'; 
+                    } 
                 } 
-            } 
-        });
+            });
+        } else if (warpRef.current.active) {
+             // Hide labels during warp
+             hubsRef.current.forEach(h => { if(h.labelDiv) h.labelDiv.style.display = 'none'; });
+        }
         
         renderer.render(scene, camera);
     };
@@ -1159,7 +1430,9 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     const handleResize = () => { 
         camera.aspect = window.innerWidth / window.innerHeight; 
         camera.updateProjectionMatrix(); 
-        renderer.setSize(window.innerWidth, window.innerHeight); 
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        width = window.innerWidth;
+        height = window.innerHeight;
     };
     window.addEventListener('resize', handleResize);
     
@@ -1167,21 +1440,20 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
         cancelAnimationFrame(animationId); 
         window.removeEventListener('resize', handleResize); 
         renderer.domElement.removeEventListener('click', onClick); 
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('pointerlockchange', onPointerLockChange);
         if (mountRef.current) mountRef.current.innerHTML = ''; 
         if (orbitControls) orbitControls.dispose(); 
-        pointerLock.dispose(); 
         delete (window as any).joystickMove; 
         delete (window as any).joystickLook; 
     };
   }, []);
   
-  // Render Joysticks if showJoysticks is true (mobile) and mode is pilot OR cinematic
   const shouldShowJoysticks = showJoysticks && (mode === 'pilot' || mode === 'cinematic');
 
   return (
       <>
         <div ref={mountRef} style={{ width: "100%", height: "100%", cursor: mode === 'pilot' ? "none" : "crosshair" }} />
-        {/* Only show "Click to Start" if NOT on mobile and in pilot mode and not locked */}
         {mode === 'pilot' && !isLocked && !showJoysticks && (
             <div className="pilot-instructions">
                 <h2>Pilot Mode Engaged</h2>
@@ -1202,8 +1474,8 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
 function Joystick({ zone, onMove }: { zone: 'left' | 'right', onMove: (x:number, y:number) => void }) {
     const ref = useRef<HTMLDivElement>(null); const knobRef = useRef<HTMLDivElement>(null); const touchId = useRef<number | null>(null);
     const handleStart = (e: React.TouchEvent) => { 
-        e.preventDefault(); // Prevent scrolling/ghost clicks
-        e.stopPropagation(); // Stop propagation to canvas
+        e.preventDefault(); 
+        e.stopPropagation(); 
         if (touchId.current !== null) return; 
         const touch = e.changedTouches[0]; 
         touchId.current = touch.identifier; 

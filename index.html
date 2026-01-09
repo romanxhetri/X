@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SageX | Solar System Simulation</title>
+    <title>SageX AI Universe</title>
+    <!-- ES Module Shims for older browser compatibility -->
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #020205; color: white; font-family: 'Inter', system-ui, sans-serif; touch-action: none; }
@@ -85,66 +87,73 @@
             .nav-item { padding: 8px 4px; font-size: 0.75rem; flex: 1; text-align: center; }
         }
 
-        /* Directory Mode - Beautiful Cards */
+        /* Directory Mode - Beautiful Cards - FIXED VISIBILITY */
         .directory-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 2, 5, 0.85); backdrop-filter: blur(20px);
-            z-index: 25; padding: 110px 20px 100px; overflow-y: auto;
+            background: rgba(0, 0, 0, 0.85); /* Dark semi-transparent background */
+            backdrop-filter: blur(15px);
+            z-index: 100; /* Ensure it is on top of everything */
+            padding: 110px 20px 100px; overflow-y: auto;
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 20px; align-content: start;
             animation: fadeIn 0.4s ease-out;
         }
         
         .directory-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px; 
+            background: rgba(20, 24, 30, 1); /* Solid dark background */
+            border: 1px solid rgba(0, 242, 255, 0.5); /* Clear cyan border */
+            border-radius: 16px; 
             padding: 24px; 
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: flex; flex-direction: column; align-items: center; text-align: center;
             position: relative; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         
-        .directory-card::after {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(circle at center, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
-            opacity: 0; transition: opacity 0.3s;
-        }
-
+        /* Highlight effect on hover */
         .directory-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            border-color: rgba(0, 242, 255, 0.5);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 242, 255, 0.1);
+            transform: translateY(-5px);
+            background: rgba(30, 35, 45, 1);
+            border-color: #00f2ff;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
         }
-        .directory-card:hover::after { opacity: 1; }
 
         .directory-icon { 
-            font-size: 3.5rem; margin-bottom: 16px; 
-            filter: drop-shadow(0 0 20px rgba(0, 242, 255, 0.3));
+            font-size: 4rem; 
+            margin-bottom: 16px; 
+            /* White glow to ensure dark emojis are visible on dark background */
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
             transition: transform 0.3s; z-index: 2;
+            color: #fff;
         }
-        .directory-card:hover .directory-icon { transform: scale(1.1) rotate(5deg); }
+        .directory-card:hover .directory-icon { transform: scale(1.1); text-shadow: 0 0 20px rgba(0, 242, 255, 0.8); }
 
         .directory-card h3 { 
-            margin: 0 0 8px; color: #fff; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; z-index: 2;
+            margin: 0 0 8px; 
+            color: #ffffff; /* Bright White Text */
+            font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; z-index: 2;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5); /* Cyan glow */
         }
         .directory-card p { 
-            margin: 0; color: #aaa; font-size: 0.85rem; line-height: 1.5; z-index: 2;
+            margin: 0; 
+            color: #dddddd; /* Very light grey */
+            font-size: 0.9rem; line-height: 1.5; z-index: 2;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
         
         .directory-btn {
             margin-top: 20px; z-index: 2;
-            background: rgba(0, 242, 255, 0.1); color: #00f2ff;
-            padding: 8px 20px; border-radius: 20px;
-            font-size: 0.8rem; font-weight: bold;
-            border: 1px solid rgba(0, 242, 255, 0.2);
+            background: transparent; 
+            color: #00f2ff;
+            padding: 10px 24px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: bold;
+            border: 1px solid #00f2ff;
             transition: all 0.3s;
         }
-        .directory-card:hover .directory-btn { background: #00f2ff; color: #000; }
+        .directory-card:hover .directory-btn { background: #00f2ff; color: #000; box-shadow: 0 0 15px rgba(0, 242, 255, 0.6); }
 
         @media (max-width: 600px) {
             .directory-overlay { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); padding: 120px 16px 100px; gap: 12px; }
@@ -265,24 +274,55 @@
         /* Product Grid */
         .product-grid {
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            /* Desktop: Wide cards */
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
             gap: 16px;
         }
+
+        /* Cards - Default (Desktop/Horizontal) */
+        .product-card {
+            background: rgba(255,255,255,0.04); border-radius: 12px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s, border-color 0.2s;
+            display: flex; 
+            flex-direction: row; /* Horizontal Image | Content */
+            cursor: pointer; position: relative;
+            height: 160px;
+        }
+        .product-card:active { transform: scale(0.98); }
+        .product-card:hover { border-color: rgba(0,242,255,0.4); }
+
+        .product-card-img-wrapper {
+            width: 140px; height: 100%; position: relative; flex-shrink: 0;
+            background: #050505;
+        }
+        .product-card-img-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;
+        }
+        
+        .product-card-content {
+            padding: 12px 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
+        }
+
+        /* Mobile specific card overrides */
         @media (max-width: 600px) {
-            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .product-grid { 
+                grid-template-columns: repeat(2, 1fr); /* 2 columns grid */
+                gap: 10px; 
+            }
+            .product-card {
+                flex-direction: column; /* Vertical Image / Content */
+                height: auto;
+            }
+            .product-card-img-wrapper {
+                width: 100%; height: 150px;
+            }
+            .product-card-content {
+                padding: 10px;
+            }
         }
         @media (max-width: 360px) {
             .product-grid { grid-template-columns: 1fr; }
         }
-
-        /* Cards */
-        .product-card {
-            background: rgba(255,255,255,0.04); border-radius: 12px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s, border-color 0.2s;
-            display: flex; flex-direction: column; cursor: pointer; position: relative;
-        }
-        .product-card:active { transform: scale(0.98); }
-        .product-card:hover { border-color: rgba(0,242,255,0.4); }
 
         /* Modal Base */
         .modal-overlay {
@@ -362,8 +402,12 @@
             pointer-events: auto; cursor: pointer; background: rgba(0, 0, 0, 0.6);
             padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(4px); transition: all 0.2s; user-select: none;
-            white-space: nowrap; transform: translate(-50%, -50%);
+            white-space: nowrap; 
+            /* Optimization for performance */
+            top: 0; left: 0;
+            will-change: transform;
             z-index: 5; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            display: none; /* Hidden by default until JS positions it */
         }
         .planet-label:hover { z-index: 50; border-color: #00f2ff; background: rgba(0, 242, 255, 0.2); }
 
@@ -394,6 +438,12 @@
             max-height: 90vh; overflow-y: auto;
         }
         .form-input { padding: 10px; background: #222; border: 1px solid #444; border-radius: 6px; color: white; width: 100%; }
+        
+        .no-js-warning {
+             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+             background: #000; color: white; display: flex; justify-content: center; align-items: center;
+             padding: 20px; text-align: center;
+        }
     </style>
 <script>
     // Polyfill for process.env to ensure deployment readiness on static hosts like Netlify
@@ -418,6 +468,12 @@
 </script>
 </head>
 <body>
+    <noscript>
+        <div class="no-js-warning">
+            <h1>JavaScript is Required</h1>
+            <p>Please enable JavaScript to experience the SageX AI Universe.</p>
+        </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
 </body>
