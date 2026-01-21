@@ -146,16 +146,17 @@ const INITIAL_PRODUCTS: Product[] = [
 ];
 
 const INITIAL_VIDEOS: Video[] = [
-    { id: "v1", title: "Getting Started with SageX", description: "Learn how to navigate the 3D world.", embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg", duration: "10:05", views: 1200 },
-    { id: "v2", title: "AI Tools Mastery", description: "Master the 16+ AI tools available.", embedUrl: "https://www.youtube.com/embed/LXb3EKWsInQ", thumbnail: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", duration: "15:30", views: 850 },
-    { id: "v3", title: "Future of VR Shopping", description: "How VR is changing e-commerce.", embedUrl: "https://www.youtube.com/embed/f3A59g1C2qQ", thumbnail: "https://img.youtube.com/vi/f3A59g1C2qQ/0.jpg", duration: "08:20", views: 2300 },
-    { id: "v4", title: "Coding in the Metaverse", description: "Building 3D web apps with Three.js.", embedUrl: "https://www.youtube.com/embed/Q6q1d8s7JMA", thumbnail: "https://img.youtube.com/vi/Q6q1d8s7JMA/0.jpg", duration: "25:10", views: 5000 },
+    { id: "v1", title: "Introduction to SageX", description: "Learn how to navigate the universe.", embedUrl: "https://www.youtube.com/embed/LXb3EKWsInQ", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=80", duration: "05:30", views: 12500 },
+    { id: "v2", title: "Top 10 Tech Gadgets 2024", description: "The must-have technology of the year.", embedUrl: "https://www.youtube.com/embed/09839DpTctU", thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=500&q=80", duration: "08:30", views: 15200 },
+    { id: "v3", title: "Web Development Masterclass", description: "Learn to build modern web applications.", embedUrl: "https://www.youtube.com/embed/nu_pCVPKzTk", thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=500&q=80", duration: "45:00", views: 8900 },
+    { id: "v4", title: "Space Exploration Documentary", description: "Journey to the edge of the universe.", embedUrl: "https://www.youtube.com/embed/ItBw3OxJplE", thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=80", duration: "22:15", views: 34000 },
 ];
 
 const AI_TOOLS = [
-  "Text Generator", "Image Synthesis", "Code Assistant", "Data Analyst", "Voice Clone", "Video Creator",
-  "SEO Optimizer", "Logo Maker", "Chat Bot Builder", "Email Writer", "Presentation AI", "Legal Assistant",
-  "Medical Diagnosis", "Stock Predictor", "Music Composer", "3D Modeler"
+    "Image Generator", "Code Assistant", "Text Summarizer", "Voice Cloner", 
+    "Video Editor", "Logo Creator", "SEO Optimizer", "Email Writer",
+    "Data Analyst", "Music Composer", "Presentation Builder", "Legal Assistant",
+    "Language Tutor", "Resume Builder", "Math Solver", "Travel Planner"
 ];
 
 const AI_MODEL = "gemini-3-flash-preview";
@@ -960,15 +961,16 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     // Position camera further back on mobile for better framing
     camera.position.set(0, isLowEnd ? 160 : 100, isLowEnd ? 300 : 180);
     
+    // Fix for mobile black screen: Do not force precision to "mediump". Let browser decide.
+    // Cap pixelRatio to 1.5 to save performance.
     const renderer = new THREE.WebGLRenderer({ 
-        antialias: !isLowEnd, // Disable AA on mobile
-        alpha: false, // Opaque is faster
-        powerPreference: "default", // Changed from 'high-performance' to avoid crashes
-        precision: isLowEnd ? "mediump" : "highp" 
+        antialias: !isLowEnd, 
+        alpha: false, 
+        powerPreference: "default", 
+        // precision removed to allow highp if available (fixes shader crash on some mobiles)
     }); 
     renderer.setSize(window.innerWidth, window.innerHeight); 
-    // IMPORTANT: Cap pixel ratio to 1 for mobile to prevent overheating and low FPS
-    renderer.setPixelRatio(isLowEnd ? 1 : Math.min(window.devicePixelRatio, 1.5)); 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
     mountRef.current.appendChild(renderer.domElement);
     
     const labelContainer = document.createElement('div'); 
@@ -1048,19 +1050,7 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     const starMesh = new THREE.Points(starsGeo, starsMat); 
     scene.add(starMesh);
     
-    // WARP SPEED LINES
-    const warpGeo = new THREE.BufferGeometry();
-    const warpCount = 1000;
-    const warpPos = new Float32Array(warpCount * 3);
-    for(let i=0; i<warpCount*3; i+=3) {
-        warpPos[i] = (Math.random() - 0.5) * 400;
-        warpPos[i+1] = (Math.random() - 0.5) * 400;
-        warpPos[i+2] = (Math.random() - 0.5) * 400;
-    }
-    warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
-    const warpMat = new THREE.PointsMaterial({ color: 0x00ffff, size: 2, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
-    const warpMesh = new THREE.Points(warpGeo, warpMat);
-    scene.add(warpMesh);
+    // NOTE: Warp speed particles (blue dots) removed as per request.
 
     // UFOS - Disable on low-end
     const ufoGroup = new THREE.Group();
@@ -1225,21 +1215,13 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
                 const warpIntensity = Math.sin(t * Math.PI); 
                 camera.fov = 45 + (warpIntensity * 30); 
                 camera.updateProjectionMatrix();
-
-                warpMat.opacity = warpIntensity * 0.8;
                 
-                const positions = warpMesh.geometry.attributes.position.array as Float32Array;
-                for(let i=2; i<positions.length; i+=3) {
-                    positions[i] += 50 * warpIntensity;
-                    if(positions[i] > 200) positions[i] -= 400;
-                }
-                warpMesh.geometry.attributes.position.needsUpdate = true;
+                // No warp particles (blue dots) here anymore.
 
             } else {
                 warpRef.current.active = false;
                 camera.fov = 45;
                 camera.updateProjectionMatrix();
-                warpMat.opacity = 0;
                 if (warpRef.current.hub) onHubSelect(warpRef.current.hub);
                 controlsRef.current.enabled = true;
             }
