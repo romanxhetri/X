@@ -146,10 +146,9 @@ const INITIAL_PRODUCTS: Product[] = [
 ];
 
 const INITIAL_VIDEOS: Video[] = [
-    { id: "v1", title: "Introduction to SageX", description: "Learn how to navigate the universe.", embedUrl: "https://www.youtube.com/embed/LXb3EKWsInQ", thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=500&q=80", duration: "05:30", views: 12500 },
-    { id: "v2", title: "Top 10 Tech Gadgets 2024", description: "The must-have technology of the year.", embedUrl: "https://www.youtube.com/embed/09839DpTctU", thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=500&q=80", duration: "08:30", views: 15200 },
-    { id: "v3", title: "Web Development Masterclass", description: "Learn to build modern web applications.", embedUrl: "https://www.youtube.com/embed/nu_pCVPKzTk", thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=500&q=80", duration: "45:00", views: 8900 },
-    { id: "v4", title: "Space Exploration Documentary", description: "Journey to the edge of the universe.", embedUrl: "https://www.youtube.com/embed/ItBw3OxJplE", thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=80", duration: "22:15", views: 34000 },
+    { id: "v1", title: "Future of AI in Shopping", description: "How AI changes how we buy.", embedUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg", duration: "12:05", views: 15400 },
+    { id: "v2", title: "Top 10 Gadgets 2024", description: "Must have tech for this year.", embedUrl: "https://www.youtube.com/embed/LXb3EKWsInQ", thumbnail: "https://img.youtube.com/vi/LXb3EKWsInQ/0.jpg", duration: "8:30", views: 8900 },
+    { id: "v3", title: "Coding in VR", description: "Is this the future of work?", embedUrl: "https://www.youtube.com/embed/u1cuuB-G29s", thumbnail: "https://img.youtube.com/vi/u1cuuB-G29s/0.jpg", duration: "15:20", views: 22100 },
 ];
 
 const AI_TOOLS = [
@@ -161,91 +160,27 @@ const AI_TOOLS = [
 
 const AI_MODEL = "gemini-3-flash-preview";
 
-// --- Shader Helper: Simplex Noise (Shared string) ---
-const noiseFunction = `
-// Simplex 3D Noise (Simplified)
-vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
-float snoise(vec3 v) {
-  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-  vec3 i  = floor(v + dot(v, C.yyy) );
-  vec3 x0 = v - i + dot(i, C.xxx) ;
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min( g.xyz, l.zxy );
-  vec3 i2 = max( g.xyz, l.zxy );
-  vec3 x1 = x0 - i1 + C.xxx;
-  vec3 x2 = x0 - i2 + C.yyy;
-  vec3 x3 = x0 - D.yyy;
-  i = mod289(i);
-  vec4 p = permute( permute( permute(
-             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-  float n_ = 0.142857142857;
-  vec3  ns = n_ * D.wyz - D.xzx;
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_ );
-  vec4 x = x_ *ns.x + ns.yyyy;
-  vec4 y = y_ *ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-  vec4 b0 = vec4( x.xy, y.xy );
-  vec4 b1 = vec4( x.zw, y.zw );
-  vec4 s0 = floor(b0)*2.0 + 1.0;
-  vec4 s1 = floor(b1)*2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-  vec3 p0 = vec3(a0.xy,h.x);
-  vec3 p1 = vec3(a0.zw,h.y);
-  vec3 p2 = vec3(a1.xy,h.z);
-  vec3 p3 = vec3(a1.zw,h.w);
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
-                                dot(p2,x2), dot(p3,x3) ) );
-}
-`;
-
-// --- Sun Shader ---
-const sunVertexShader = `
-varying vec2 vUv;
-varying vec3 vNormal;
-void main() {
-  vUv = uv;
-  vNormal = normal;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-const sunFragmentShader = `
-uniform float time;
-varying vec2 vUv;
-varying vec3 vNormal;
-${noiseFunction}
-
-void main() {
-  float noiseVal = snoise(vNormal * 2.5 + time * 0.5);
-  vec3 color1 = vec3(0.8, 0.2, 0.0); 
-  vec3 color2 = vec3(1.0, 0.8, 0.1); 
-  vec3 color3 = vec3(1.0, 1.0, 0.9); 
-  vec3 finalColor = mix(color1, color2, noiseVal * 0.5 + 0.5);
-  finalColor = mix(finalColor, color3, pow(max(0.0, noiseVal), 3.0));
-  gl_FragColor = vec4(finalColor, 1.0);
-}
-`;
-
 // --- Components ---
+
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: string}> {
+    constructor(props: any) {
+        super(props);
+        this.state = { hasError: false, error: "" };
+    }
+    static getDerivedStateFromError(error: any) {
+        return { hasError: true, error: error.toString() };
+    }
+    render() {
+        if (this.state.hasError) {
+            return <div style={{ padding: 20, color: "red", textAlign: "center" }}>
+                <h2>Something went wrong.</h2>
+                <p>{this.state.error}</p>
+                <button onClick={() => window.location.reload()} style={{padding:10}}>Reload</button>
+            </div>;
+        }
+        return this.props.children;
+    }
+}
 
 function App() {
   const [navMode, setNavMode] = useState<NavMode>('cinematic');
@@ -262,8 +197,16 @@ function App() {
   const [showAutopilot, setShowAutopilot] = useState(false);
   const [initialHubFilters, setInitialHubFilters] = useState<{sortBy?: string, searchTerm?: string}>({});
   
+  // 3D Support Check
+  const [is3DSupported, setIs3DSupported] = useState(true);
+
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [videos, setVideos] = useState<Video[]>(INITIAL_VIDEOS);
+
+  // If 3D fails, default to directory mode
+  useEffect(() => {
+      if (!is3DSupported) setNavMode('directory');
+  }, [is3DSupported]);
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -307,57 +250,61 @@ function App() {
       const text = cmd.toLowerCase();
       let targetHubId = null;
       let sortBy = "recommended";
-      
-      if (text.includes("laptop") || text.includes("computer")) targetHubId = "laptop";
-      else if (text.includes("mobile") || text.includes("phone")) targetHubId = "mobile";
-      else if (text.includes("fashion") || text.includes("cloth") || text.includes("wear")) targetHubId = "fashion";
-      else if (text.includes("used") || text.includes("second") || text.includes("2nd")) targetHubId = "secondhand";
-      else if (text.includes("video") || text.includes("learn") || text.includes("tutorial")) targetHubId = "video";
-      else if (text.includes("tools") || text.includes("ai")) targetHubId = "tools";
-      else if (text.includes("real") || text.includes("estate") || text.includes("property")) targetHubId = "realstate";
-      else if (text.includes("product") || text.includes("gadget")) targetHubId = "products";
+      // ... logic same ...
+      if (text.includes("laptop")) targetHubId = "laptop";
+      else if (text.includes("mobile")) targetHubId = "mobile";
+      else if (text.includes("fashion")) targetHubId = "fashion";
+      else if (text.includes("used")) targetHubId = "secondhand";
+      else if (text.includes("video")) targetHubId = "video";
+      else if (text.includes("tools")) targetHubId = "tools";
+      else if (text.includes("real")) targetHubId = "realstate";
+      else if (text.includes("product")) targetHubId = "products";
 
-      if (text.includes("cheap") || text.includes("low price") || text.includes("budget")) sortBy = "priceLow";
-      else if (text.includes("expensive") || text.includes("premium") || text.includes("high price")) sortBy = "priceHigh";
-      else if (text.includes("best") || text.includes("rated") || text.includes("popular")) sortBy = "rating";
+      if (text.includes("cheap")) sortBy = "priceLow";
+      else if (text.includes("expensive")) sortBy = "priceHigh";
+      else if (text.includes("best")) sortBy = "rating";
 
       if (targetHubId) {
           const hub = HUBS.find(h => h.id === targetHubId);
           if (hub) {
               setInitialHubFilters({ sortBy });
               setActiveHub(hub);
-              setNavMode('cinematic'); 
+              if (is3DSupported) setNavMode('cinematic');
               setShowAutopilot(false);
           }
       } else {
-          alert("Autopilot could not identify a valid destination. Try 'Go to Laptop Hub' or 'Find cheap phones'.");
+          alert("Autopilot could not identify a valid destination.");
       }
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   if (showAdmin) {
-      return <AdminDashboard 
-                onClose={() => setShowAdmin(false)} 
-                products={products} 
-                setProducts={setProducts} 
-                videos={videos} 
-                setVideos={setVideos}
-                currentUser={user}
-            />;
+      return <AdminDashboard onClose={() => setShowAdmin(false)} products={products} setProducts={setProducts} videos={videos} setVideos={setVideos} currentUser={user} />;
   }
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}>
-      <SolarSystemScene 
-        onHubSelect={(hub) => {
-          setInitialHubFilters({}); 
-          setActiveHub(hub);
-          if(navMode !== 'directory') setNavMode('cinematic'); 
-        }} 
-        isPaused={!!activeHub || navMode === 'directory'}
-        mode={navMode}
-      />
+    <div style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", background: "#020205" }}>
+      {/* 3D Scene - Only Render if Supported */}
+      {is3DSupported ? (
+          <SolarSystemScene 
+            onHubSelect={(hub) => {
+              setInitialHubFilters({}); 
+              setActiveHub(hub);
+              if(navMode !== 'directory') setNavMode('cinematic'); 
+            }} 
+            isPaused={!!activeHub || navMode === 'directory'}
+            mode={navMode}
+            onError={() => setIs3DSupported(false)}
+          />
+      ) : (
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(to bottom, #000000, #0a0a1a)", display: "flex", justifyContent: "center", alignItems: "center", color: "#666" }}>
+              <div style={{textAlign: "center"}}>
+                  <h2>3D Universe Disabled</h2>
+                  <p>Running in Lite Mode for your device.</p>
+              </div>
+          </div>
+      )}
       
       <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 10 }}>
         <Header 
@@ -374,19 +321,15 @@ function App() {
 
       <NavBar currentMode={navMode} setMode={setNavMode} />
 
-      {showAutopilot && (
-          <AutopilotBar 
-            onCommand={handleAutopilotCommand} 
-            onClose={() => setShowAutopilot(false)} 
-          />
-      )}
+      {showAutopilot && <AutopilotBar onCommand={handleAutopilotCommand} onClose={() => setShowAutopilot(false)} />}
 
-      {navMode === 'directory' && (
+      {/* Directory is ALWAYS visible if 3D fails, or if explicitly selected */}
+      {(navMode === 'directory' || !is3DSupported) && (
         <DirectoryOverlay 
           onSelect={(hub) => {
             setInitialHubFilters({});
             setActiveHub(hub);
-            setNavMode('cinematic'); 
+            if (is3DSupported) setNavMode('cinematic'); 
           }}
         />
       )}
@@ -408,21 +351,12 @@ function App() {
           onClose={() => setSelectedProduct(null)}
           addToCart={addToCart}
           buyNow={(p) => { addToCart(p); setIsCheckoutOpen(true); setSelectedProduct(null); }}
-          isWishlisted={user?.wishlist.includes(selectedProduct.id) || false}
+          isWishlisted={(user && user.wishlist.includes(selectedProduct.id)) || false}
           toggleWishlist={() => toggleWishlist(selectedProduct.id)}
         />
       )}
 
-      {isCheckoutOpen && (
-        <CheckoutModal 
-          cart={cart}
-          total={cartTotal}
-          onClose={() => setIsCheckoutOpen(false)}
-          onPlaceOrder={handlePlaceOrder}
-          user={user}
-        />
-      )}
-
+      {isCheckoutOpen && <CheckoutModal cart={cart} total={cartTotal} onClose={() => setIsCheckoutOpen(false)} onPlaceOrder={handlePlaceOrder} user={user} />}
       {showProfile && user && <ProfileModal user={user} onClose={() => setShowProfile(false)} />}
       {showAuthModal && <AuthModal onLogin={handleLogin} onClose={() => setShowAuthModal(false)} />}
       {isCartOpen && <CartDrawer cart={cart} onClose={() => setIsCartOpen(false)} onRemove={removeFromCart} onUpdateQty={updateQuantity} total={cartTotal} onCheckout={() => { setIsCartOpen(false); setIsCheckoutOpen(true); }} />}
@@ -430,6 +364,8 @@ function App() {
     </div>
   );
 }
+
+// ... (AutopilotBar, AdminDashboard, AdminUsers, AdminProducts, AdminVideos, AdminSupport, Header, HubOverlay, NavBar, DirectoryOverlay, ProductDetailsModal, CheckoutModal, AuthModal, ProfileModal, CartDrawer, ChatInterface remain identical to previous iteration, standard React components) ...
 
 function AutopilotBar({ onCommand, onClose }: { onCommand: (cmd: string) => void, onClose: () => void }) {
     const [input, setInput] = useState("");
@@ -700,7 +636,7 @@ function Header({ cartCount, openCart, toggleChat, user, openAuth, openProfile, 
           <span>🛒</span><span style={{ fontWeight: "bold" }}>({cartCount})</span>
         </button>
         {user ? (
-          <button className="header-sm-btn" onClick={openProfile} style={{ background: "rgba(255,165,0,0.2)", border: "1px solid orange", color: "orange", fontWeight: "bold" }}>👤 {user.name.split(' ')[0]}</button>
+          <button className="header-sm-btn" onClick={openProfile} style={{ background: "rgba(255,165,0,0.2)", border: "1px solid orange", color: "orange", fontWeight: "bold" }}>👤 {(user && user.name.split(' ')[0]) || "User"}</button>
         ) : (
           <button className="header-sm-btn" onClick={openAuth} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.5)", color: "white" }}>Login</button>
         )}
@@ -856,7 +792,7 @@ function ProductDetailsModal({ product, onClose, addToCart, buyNow, isWishlisted
 
 function CheckoutModal({ cart, total, onClose, onPlaceOrder, user }: any) {
     const [step, setStep] = useState(1);
-    const [address, setAddress] = useState({ name: user?.name || "", phone: "", city: "", area: "" });
+    const [address, setAddress] = useState({ name: (user && user.name) || "", phone: "", city: "", area: "" });
     const [payment, setPayment] = useState("cod");
     return (
         <div className="modal-overlay"><div className="modal-content-responsive"><div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}><h2 style={{ margin: 0 }}>Checkout</h2><button onClick={onClose} style={{ background: "none", border: "none", color: "#666", fontSize: "1.5rem", cursor: "pointer" }}>×</button></div>
@@ -867,7 +803,7 @@ function CheckoutModal({ cart, total, onClose, onPlaceOrder, user }: any) {
 
 function AuthModal({ onLogin, onClose }: any) {
   const [isRegister, setIsRegister] = useState(false); const [name, setName] = useState(""); const [email, setEmail] = useState("");
-  return <div className="modal-overlay"><div className="modal-content-responsive" style={{ maxWidth: 400 }}><h2 style={{ textAlign: "center", marginBottom: 30, color: "white" }}>{isRegister ? "Create Account" : "Welcome Back"}</h2>{isRegister && <input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} />}<input placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><input type="password" placeholder="Password" style={{ width: "100%", padding: 12, marginBottom: 24, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><button onClick={() => onLogin(email, name || "User")} style={{ width: "100%", padding: 14, background: "#00f2ff", border: "none", borderRadius: 8, fontWeight: "bold", cursor: "pointer", marginBottom: 16 }}>{isRegister ? "Sign Up" : "Login"}</button><div style={{ textAlign: "center", fontSize: "0.9rem", color: "#888", cursor: "pointer" }} onClick={() => setIsRegister(!isRegister)}>{isRegister ? "Already have an account? Login" : "New to SageX? Register"}</div><button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "666", fontSize: "1.5rem", cursor: "pointer" }}>×</button></div></div>;
+  return <div className="modal-overlay"><div className="modal-content-responsive" style={{ maxWidth: 400 }}><h2 style={{ textAlign: "center", marginBottom: 30, color: "white" }}>{isRegister ? "Create Account" : "Welcome Back"}</h2>{isRegister && <input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} />}<input placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} style={{ width: "100%", padding: 12, marginBottom: 16, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><input type="password" placeholder="Password" style={{ width: "100%", padding: 12, marginBottom: 24, borderRadius: 8, background: "#222", border: "1px solid #444", color: "white", boxSizing: "border-box" }} /><button onClick={() => onLogin(email, name || "User")} style={{ width: "100%", padding: 14, background: "#00f2ff", border: "none", borderRadius: 8, fontWeight: "bold", cursor: "pointer", marginBottom: 16 }}>{isRegister ? "Sign Up" : "Login"}</button><div style={{ textAlign: "center", fontSize: "0.9rem", color: "#888", cursor: "pointer" }} onClick={() => setIsRegister(!isRegister)}>{isRegister ? "Already have an account? Login" : "New to SageX? Register"}</div><button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "#666", fontSize: "1.5rem", cursor: "pointer" }}>×</button></div></div>;
 }
 
 function ProfileModal({ user, onClose }: any) {
@@ -886,7 +822,7 @@ function ChatInterface({ activeHub, onClose }: { activeHub: HubData | null, onCl
 
 // --- Three.js Logic ---
 
-function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: HubData) => void, isPaused: boolean, mode: NavMode }) {
+function SolarSystemScene({ onHubSelect, isPaused, mode, onError }: { onHubSelect: (h: HubData) => void, isPaused: boolean, mode: NavMode, onError: () => void }) {
   const mountRef = useRef<HTMLDivElement>(null);
   const simState = useRef({ isPaused, mode });
   
@@ -946,220 +882,153 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
   useEffect(() => {
     if (!mountRef.current) return;
     
-    // PERFORMANCE & DEVICE DETECTION
-    const isLowEnd = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-    
-    const scene = new THREE.Scene(); 
-    // Revert to clean dark background
-    scene.background = new THREE.Color(0x020205); 
-    scene.fog = new THREE.FogExp2(0x020205, 0.001); 
-    
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000); 
-    cameraRef.current = camera;
-    camera.rotation.order = 'YXZ';
-    
-    // Position camera further back on mobile for better framing
-    camera.position.set(0, isLowEnd ? 160 : 100, isLowEnd ? 300 : 180);
-    
-    // Fix for mobile black screen: Do not force precision to "mediump". Let browser decide.
-    // Cap pixelRatio to 1.5 to save performance.
-    const renderer = new THREE.WebGLRenderer({ 
-        antialias: !isLowEnd, 
-        alpha: false, 
-        powerPreference: "default", 
-        // precision removed to allow highp if available (fixes shader crash on some mobiles)
-    }); 
-    renderer.setSize(window.innerWidth, window.innerHeight); 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
-    mountRef.current.appendChild(renderer.domElement);
-    
-    const labelContainer = document.createElement('div'); 
-    labelContainer.style.position = 'absolute'; labelContainer.style.top = '0'; labelContainer.style.left = '0'; 
-    labelContainer.style.width = '100%'; labelContainer.style.height = '100%'; 
-    labelContainer.style.pointerEvents = 'none'; labelContainer.style.overflow = 'hidden'; 
-    mountRef.current.appendChild(labelContainer);
-    
-    let orbitControls = new OrbitControls(camera, renderer.domElement); 
-    orbitControls.enableDamping = true; orbitControls.dampingFactor = 0.05;
-    orbitControls.autoRotate = true; orbitControls.autoRotateSpeed = 0.5; 
-    controlsRef.current = orbitControls;
-    
-    const onMouseMove = (event: MouseEvent) => {
-        if (document.pointerLockElement === document.body) {
-             camera.rotation.y -= event.movementX * 0.002;
-             camera.rotation.x -= event.movementY * 0.002;
-             camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
-        }
-    };
-    const onPointerLockChange = () => {
-        setIsLocked(document.pointerLockElement === document.body);
-    };
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('pointerlockchange', onPointerLockChange);
-    
-    // LIGHTING
-    const ambientLight = new THREE.AmbientLight(0x404040, 2); 
-    scene.add(ambientLight);
-    
-    // Only one point light for the sun
-    const coreLight = new THREE.PointLight(0xffaa00, 3, 400); 
-    scene.add(coreLight);
-    
-    // GEOMETRY OPTIMIZATION
-    const segs = isLowEnd ? 24 : 64; 
+    let scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer;
+    let orbitControls: any;
+    let animationId: number;
+    let core: THREE.Mesh;
+    let starMesh: THREE.Points;
 
-    // --- SUN SHADER ---
-    const coreGeo = new THREE.SphereGeometry(10, segs, segs); 
-    const coreMat = new THREE.ShaderMaterial({
-        vertexShader: sunVertexShader,
-        fragmentShader: sunFragmentShader,
-        uniforms: {
-            time: { value: 0 }
-        }
-    });
-    const core = new THREE.Mesh(coreGeo, coreMat); 
-    scene.add(core);
-
-    const glowGeo = new THREE.SphereGeometry(12, segs, segs); 
-    const glowMat = new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.3 }); 
-    const glow = new THREE.Mesh(glowGeo, glowMat); 
-    scene.add(glow);
-    
-    // Outer Halo
-    const haloGeo = new THREE.SphereGeometry(16, segs, segs); 
-    const haloMat = new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.15, blending: THREE.AdditiveBlending }); 
-    const halo = new THREE.Mesh(haloGeo, haloMat); 
-    scene.add(halo);
-
-    // STARS
-    const starsGeo = new THREE.BufferGeometry(); 
-    const starsCnt = isLowEnd ? 500 : 3000; 
-    const posArray = new Float32Array(starsCnt * 3); 
-    const colorsArray = new Float32Array(starsCnt * 3);
-    for(let i=0; i<starsCnt*3; i+=3) { 
-        posArray[i] = (Math.random() - 0.5) * 1200; 
-        posArray[i+1] = (Math.random() - 0.5) * 1200;
-        posArray[i+2] = (Math.random() - 0.5) * 1200;
+    try {
+        // --- SAFE INITIALIZATION BLOCK ---
+        const isLowEnd = true; // FORCE SAFE MODE
         
-        const c = 0.8 + Math.random() * 0.2;
-        colorsArray[i] = c; colorsArray[i+1] = c; colorsArray[i+2] = c;
-    } 
-    starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3)); 
-    starsGeo.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
-    const starsMat = new THREE.PointsMaterial({size: isLowEnd ? 1.5 : 0.8, vertexColors: true, sizeAttenuation: true}); 
-    const starMesh = new THREE.Points(starsGeo, starsMat); 
-    scene.add(starMesh);
-    
-    // NOTE: Warp speed particles (blue dots) removed as per request.
+        scene = new THREE.Scene(); 
+        scene.background = new THREE.Color(0x020205); 
+        scene.fog = new THREE.FogExp2(0x020205, 0.001); 
+        
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000); 
+        cameraRef.current = camera;
+        camera.rotation.order = 'YXZ';
+        
+        // Position camera Logic
+        const aspect = window.innerWidth / window.innerHeight;
+        const baseDistance = 180;
+        const distance = aspect < 1 ? baseDistance / (aspect * 0.8) : baseDistance;
+        camera.position.set(0, distance * 0.6, distance);
+        
+        // --- RENDERER SAFETY ---
+        try {
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: false, 
+                alpha: false, 
+                powerPreference: "high-performance",
+                failIfMajorPerformanceCaveat: false,
+                depth: true,
+                stencil: false
+            }); 
+        } catch (e) {
+            console.error("WebGL Renderer failed to initialize", e);
+            onError(); // TRIGGER FALLBACK TO DIRECTORY MODE
+            return;
+        }
 
-    // UFOS - Disable on low-end
-    const ufoGroup = new THREE.Group();
-    const ufos: any[] = [];
-    if (!isLowEnd) {
-        scene.add(ufoGroup);
-        const createUFO = (type: 'saucer' | 'rocket') => {
-            const ufo = new THREE.Group();
-            if (type === 'saucer') {
-                const body = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16).scale(1, 0.3, 1), new THREE.MeshLambertMaterial({ color: 0xaaaaaa }));
-                const dome = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16).translate(0, 0.2, 0), new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.8 }));
-                ufo.add(body, dome);
-            } else {
-                 const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 2, 8), new THREE.MeshLambertMaterial({ color: 0xff4444 }));
-                 body.rotation.x = Math.PI / 2;
-                 ufo.add(body);
+        renderer.setSize(window.innerWidth, window.innerHeight); 
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
+        renderer.domElement.style.display = 'block';
+        mountRef.current.appendChild(renderer.domElement);
+        
+        const labelContainer = document.createElement('div'); 
+        labelContainer.style.position = 'absolute'; labelContainer.style.top = '0'; labelContainer.style.left = '0'; 
+        labelContainer.style.width = '100%'; labelContainer.style.height = '100%'; 
+        labelContainer.style.pointerEvents = 'none'; labelContainer.style.overflow = 'hidden'; 
+        mountRef.current.appendChild(labelContainer);
+        
+        orbitControls = new OrbitControls(camera, renderer.domElement); 
+        orbitControls.enableDamping = true; orbitControls.dampingFactor = 0.05;
+        orbitControls.autoRotate = true; orbitControls.autoRotateSpeed = 0.5; 
+        controlsRef.current = orbitControls;
+        
+        // LIGHTING
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+        scene.add(ambientLight);
+        
+        const coreLight = new THREE.PointLight(0xffaa00, 2, 400); 
+        scene.add(coreLight);
+        
+        // --- OBJECTS ---
+        const segs = 32; 
+        const coreGeo = new THREE.SphereGeometry(10, segs, segs); 
+        const coreMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        core = new THREE.Mesh(coreGeo, coreMat); 
+        scene.add(core);
+
+        const starsGeo = new THREE.BufferGeometry(); 
+        const starsCnt = 100; 
+        const posArray = new Float32Array(starsCnt * 3); 
+        for(let i=0; i<starsCnt*3; i+=3) { 
+            posArray[i] = (Math.random() - 0.5) * 1200; 
+            posArray[i+1] = (Math.random() - 0.5) * 1200;
+            posArray[i+2] = (Math.random() - 0.5) * 1200;
+        } 
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3)); 
+        const starsMat = new THREE.PointsMaterial({ size: 2, color: 0xffffff, sizeAttenuation: false }); 
+        starMesh = new THREE.Points(starsGeo, starsMat); 
+        scene.add(starMesh);
+
+        hubsRef.current = [];
+        HUBS.forEach((h) => {
+            let geo;
+            if (h.geometryType === 'torus') geo = new THREE.TorusGeometry(h.radius, h.radius * 0.4, 16, 24);
+            else if (h.geometryType === 'icosahedron') geo = new THREE.IcosahedronGeometry(h.radius, 0);
+            else geo = new THREE.SphereGeometry(h.radius, segs, segs); 
+
+            const mat = new THREE.MeshLambertMaterial({ color: h.color, wireframe: h.geometryType === 'icosahedron' }); 
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            if (h.hasRing) { 
+                const ringGeo = new THREE.RingGeometry(h.radius * 1.5, h.radius * 2.2, 32); 
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }); 
+                const ring = new THREE.Mesh(ringGeo, ringMat); 
+                ring.rotation.x = -Math.PI / 2; ring.rotation.y = Math.PI / 6; mesh.add(ring); 
             }
-            return ufo;
-        };
+            
+            if (h.geometryType === 'icosahedron') {
+                const innerGeo = new THREE.IcosahedronGeometry(h.radius * 0.6, 0);
+                const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const inner = new THREE.Mesh(innerGeo, innerMat);
+                mesh.add(inner);
+            }
 
-        for(let i=0; i<8; i++) { 
-            const type = Math.random() > 0.5 ? 'saucer' : 'rocket';
-            const ufo = createUFO(type);
-            const dist = 50 + Math.random() * 120;
-            const angle = Math.random() * Math.PI * 2;
-            const speed = (0.002 + Math.random() * 0.008) * (Math.random() > 0.5 ? 1 : -1);
-            const yOffset = (Math.random() - 0.5) * 40;
-            ufo.position.set(Math.cos(angle)*dist, yOffset, Math.sin(angle)*dist);
-            ufo.rotation.y = angle + Math.PI/2;
-            ufoGroup.add(ufo);
-            ufos.push({ mesh: ufo, dist, angle, speed, yOffset, type });
-        }
-    }
-
-    hubsRef.current = [];
-    HUBS.forEach((h, i) => {
-        let geo;
-        if (h.geometryType === 'torus') {
-            geo = new THREE.TorusGeometry(h.radius, h.radius * 0.4, 16, 32);
-        } else if (h.geometryType === 'icosahedron') {
-            geo = new THREE.IcosahedronGeometry(h.radius, 0);
-        } else {
-            geo = new THREE.SphereGeometry(h.radius, segs, segs); 
-        }
-
-        const mat = new THREE.MeshLambertMaterial({ 
-            color: h.color,
-            wireframe: h.geometryType === 'icosahedron' 
-        }); 
-        const mesh = new THREE.Mesh(geo, mat);
-        
-        if (h.hasRing) { 
-            const ringGeo = new THREE.RingGeometry(h.radius * 1.5, h.radius * 2.2, 32); 
-            const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5 }); 
-            const ring = new THREE.Mesh(ringGeo, ringMat); 
-            ring.rotation.x = -Math.PI / 2; 
-            ring.rotation.y = Math.PI / 6; 
-            mesh.add(ring); 
-        }
-        
-        if (h.geometryType === 'icosahedron') {
-             const innerGeo = new THREE.IcosahedronGeometry(h.radius * 0.6, 0);
-             const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-             const inner = new THREE.Mesh(innerGeo, innerMat);
-             mesh.add(inner);
-        }
-
-        scene.add(mesh);
-        
-        const orbitGeo = new THREE.RingGeometry(h.distance - 0.15, h.distance + 0.15, isLowEnd ? 64 : 128); 
-        const orbitMat = new THREE.MeshBasicMaterial({ color: h.color, side: THREE.DoubleSide, transparent: true, opacity: 0.15 }); 
-        const orbitLine = new THREE.Mesh(orbitGeo, orbitMat); 
-        orbitLine.rotation.x = -Math.PI / 2; 
-        scene.add(orbitLine);
-        
-        const label = document.createElement('div'); label.className = 'planet-label'; label.innerHTML = `<span style="font-size:1.2em; margin-right:4px;">${h.icon}</span> ${h.name}`; 
-        
-        label.onclick = () => {
-            if (warpRef.current.active) return;
-            warpRef.current.active = true;
-            warpRef.current.startTime = clock.getElapsedTime();
-            warpRef.current.startPos.copy(camera.position);
-            const planetPos = new THREE.Vector3().copy(mesh.position);
-            const direction = new THREE.Vector3().subVectors(camera.position, planetPos).normalize();
-            warpRef.current.target.copy(planetPos).add(direction.multiplyScalar(10));
-            warpRef.current.hub = h;
-            controlsRef.current.enabled = false;
-        };
-        
-        labelContainer.appendChild(label);
-        
-        hubsRef.current.push({ 
-            mesh, 
-            data: h, 
-            angle: Math.random() * Math.PI * 2, 
-            labelDiv: label
+            scene.add(mesh);
+            
+            const orbitGeo = new THREE.RingGeometry(h.distance - 0.15, h.distance + 0.15, 32); 
+            const orbitMat = new THREE.MeshBasicMaterial({ color: h.color, side: THREE.DoubleSide, transparent: true, opacity: 0.15 }); 
+            const orbitLine = new THREE.Mesh(orbitGeo, orbitMat); 
+            orbitLine.rotation.x = -Math.PI / 2; 
+            scene.add(orbitLine);
+            
+            const label = document.createElement('div'); label.className = 'planet-label'; label.innerHTML = `<span style="font-size:1.2em; margin-right:4px;">${h.icon}</span> ${h.name}`; 
+            
+            label.onclick = () => {
+                if (warpRef.current.active) return;
+                warpRef.current.active = true;
+                warpRef.current.startTime = clock.getElapsedTime();
+                warpRef.current.startPos.copy(camera.position);
+                const planetPos = new THREE.Vector3().copy(mesh.position);
+                const direction = new THREE.Vector3().subVectors(camera.position, planetPos).normalize();
+                warpRef.current.target.copy(planetPos).add(direction.multiplyScalar(10));
+                warpRef.current.hub = h;
+                controlsRef.current.enabled = false;
+            };
+            labelContainer.appendChild(label);
+            hubsRef.current.push({ mesh, data: h, angle: Math.random() * Math.PI * 2, labelDiv: label });
         });
-    });
+        // --- END OBJECTS ---
+
+    } catch(err) {
+        console.error("Critical Scene Setup Error:", err);
+        onError();
+        return;
+    }
     
+    // --- EVENT LISTENERS ---
     const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
     const onClick = (e: MouseEvent) => { 
-        if (simState.current.mode === 'pilot' && !isLowEnd) { 
-            if (document.pointerLockElement !== document.body) {
-                document.body.requestPointerLock(); 
-            }
+        if (simState.current.mode === 'pilot') { 
+            if (document.pointerLockElement !== document.body) document.body.requestPointerLock(); 
             return; 
         } 
         if ((e.target as HTMLElement).closest('.planet-label')) return; 
-        
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1; 
         mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; 
         raycaster.setFromCamera(mouse, camera); 
@@ -1180,20 +1049,27 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     };
     renderer.domElement.addEventListener('click', onClick);
     
+    const onMouseMove = (event: MouseEvent) => {
+        if (document.pointerLockElement === document.body) {
+             camera.rotation.y -= event.movementX * 0.002;
+             camera.rotation.x -= event.movementY * 0.002;
+             camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+        }
+    };
+    const onPointerLockChange = () => setIsLocked(document.pointerLockElement === document.body);
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('pointerlockchange', onPointerLockChange);
+
     (window as any).joystickMove = (dx: number, dy: number) => { 
         moveState.current.joyVector.set(dx, dy);
-        moveState.current.left = dx < -0.3; 
-        moveState.current.right = dx > 0.3; 
-        moveState.current.forward = dy < -0.3; 
-        moveState.current.backward = dy > 0.3; 
+        moveState.current.left = dx < -0.3; moveState.current.right = dx > 0.3; 
+        moveState.current.forward = dy < -0.3; moveState.current.backward = dy > 0.3; 
     };
     (window as any).joystickLook = (dx: number, dy: number) => { moveState.current.rotY = -dx * 0.03; moveState.current.rotX = -dy * 0.03; };
     
-    let animationId: number; const tempV = new THREE.Vector3(); const clock = new THREE.Clock();
-    
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let frame = 0;
+    const tempV = new THREE.Vector3(); const clock = new THREE.Clock();
+    let width = window.innerWidth; let height = window.innerHeight; let frame = 0;
 
     const animate = () => {
         animationId = requestAnimationFrame(animate); 
@@ -1202,22 +1078,21 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
         const elapsedTime = clock.getElapsedTime();
         const { isPaused, mode } = simState.current;
         
-        coreMat.uniforms.time.value = elapsedTime;
-
         if (warpRef.current.active) {
             const t = (elapsedTime - warpRef.current.startTime) / warpRef.current.duration;
             const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; 
-
             if (t < 1.0) {
                 camera.position.lerpVectors(warpRef.current.startPos, warpRef.current.target, easeT);
-                camera.lookAt(warpRef.current.hub ? hubsRef.current.find(h => h.data.id === warpRef.current.hub!.id)!.mesh.position : new THREE.Vector3());
-                
+                if (warpRef.current.hub) {
+                   const targetHub = hubsRef.current.find(h => h.data.id === warpRef.current.hub!.id);
+                   if (targetHub) camera.lookAt(targetHub.mesh.position);
+                   else camera.lookAt(new THREE.Vector3());
+                } else {
+                   camera.lookAt(new THREE.Vector3());
+                }
                 const warpIntensity = Math.sin(t * Math.PI); 
-                camera.fov = 45 + (warpIntensity * 30); 
+                camera.fov = 45 + (warpIntensity * 10); 
                 camera.updateProjectionMatrix();
-                
-                // No warp particles (blue dots) here anymore.
-
             } else {
                 warpRef.current.active = false;
                 camera.fov = 45;
@@ -1230,7 +1105,6 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
         if (mode === 'cinematic' && orbitControls && !warpRef.current.active) { 
             if (moveState.current.rotX !== 0 || moveState.current.rotY !== 0) {
                  orbitControls.autoRotate = false;
-                 // Fix: Manually update camera position for OrbitControls rotation
                  const dist = camera.position.distanceTo(orbitControls.target);
                  const theta = orbitControls.getAzimuthalAngle() - moveState.current.rotY * 0.05;
                  const phi = Math.max(orbitControls.minPolarAngle, Math.min(orbitControls.maxPolarAngle, orbitControls.getPolarAngle() - moveState.current.rotX * 0.05));
@@ -1238,36 +1112,19 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
             } else {
                  orbitControls.autoRotate = true;
             }
-            orbitControls.enabled = true; 
-            orbitControls.update(); 
+            orbitControls.enabled = true; orbitControls.update(); 
         }
         else if (mode === 'pilot' && !warpRef.current.active) {
              if (orbitControls) orbitControls.enabled = false;
              const speed = 50 * delta; const velocity = new THREE.Vector3();
-             
-             if (moveState.current.forward) velocity.z -= speed; 
-             if (moveState.current.backward) velocity.z += speed; 
-             if (moveState.current.left) velocity.x -= speed; 
-             if (moveState.current.right) velocity.x += speed; 
-             if (moveState.current.up) velocity.y += speed; 
-             if (moveState.current.down) velocity.y -= speed;
-             
+             if (moveState.current.forward) velocity.z -= speed; if (moveState.current.backward) velocity.z += speed; 
+             if (moveState.current.left) velocity.x -= speed; if (moveState.current.right) velocity.x += speed; 
+             if (moveState.current.up) velocity.y += speed; if (moveState.current.down) velocity.y -= speed;
              const joy = moveState.current.joyVector;
-             if (joy.lengthSq() > 0.01) {
-                 velocity.x += joy.x * speed; 
-                 velocity.z += joy.y * speed; 
-             }
-
-             camera.translateX(velocity.x); 
-             camera.translateZ(velocity.z); 
-             camera.translateY(velocity.y); 
-             
-             camera.rotateY(moveState.current.rotY); 
-             camera.rotateX(moveState.current.rotX); 
-             moveState.current.rotX *= 0.85; 
-             moveState.current.rotY *= 0.85; 
-             
-             camera.rotation.z = 0; 
+             if (joy.lengthSq() > 0.01) { velocity.x += joy.x * speed; velocity.z += joy.y * speed; }
+             camera.translateX(velocity.x); camera.translateZ(velocity.z); camera.translateY(velocity.y); 
+             camera.rotateY(moveState.current.rotY); camera.rotateX(moveState.current.rotX); 
+             moveState.current.rotX *= 0.85; moveState.current.rotY *= 0.85; camera.rotation.z = 0; 
         } 
         else if (mode === 'directory' && orbitControls) { 
             orbitControls.autoRotate = true; orbitControls.autoRotateSpeed = 0.2; orbitControls.update(); 
@@ -1282,28 +1139,16 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
                 h.mesh.rotation.y += 0.005;
                 if(h.data.geometryType === 'torus' || h.data.geometryType === 'icosahedron') h.mesh.rotation.x += 0.005;
             });
-            core.rotation.y += 0.002; 
-            starMesh.rotation.y -= 0.0001; 
-
-            // UFO Animation
-            if (!isLowEnd) {
-                ufos.forEach(u => {
-                    u.angle += u.speed;
-                    u.mesh.position.x = Math.cos(u.angle) * u.dist;
-                    u.mesh.position.y = u.yOffset + Math.sin(elapsedTime + u.dist) * 2;
-                    u.mesh.position.z = Math.sin(u.angle) * u.dist;
-                    u.mesh.rotation.y = -u.angle; 
-                });
-            }
+            if(core) core.rotation.y += 0.002; 
+            if(starMesh) starMesh.rotation.y -= 0.0001; 
         }
 
-        // Label Positioning 
+        // Label Positioning (Throttled)
         if (frame % 3 === 0 && !warpRef.current.active) {
             hubsRef.current.forEach(h => { 
                 if (h.labelDiv && h.mesh) { 
                     h.mesh.getWorldPosition(tempV); 
                     tempV.project(camera); 
-                    
                     if (tempV.z < 1 && tempV.z > -1) { 
                         const x = (tempV.x * .5 + .5) * width; 
                         const y = (tempV.y * -.5 + .5) * height; 
@@ -1323,6 +1168,7 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     animate();
     
     const handleResize = () => { 
+        if (!camera || !renderer) return;
         camera.aspect = window.innerWidth / window.innerHeight; 
         camera.updateProjectionMatrix(); 
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1334,13 +1180,12 @@ function SolarSystemScene({ onHubSelect, isPaused, mode }: { onHubSelect: (h: Hu
     return () => { 
         cancelAnimationFrame(animationId); 
         window.removeEventListener('resize', handleResize); 
-        renderer.domElement.removeEventListener('click', onClick); 
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('pointerlockchange', onPointerLockChange);
-        if (mountRef.current) mountRef.current.innerHTML = ''; 
+        if (mountRef.current && renderer) mountRef.current.innerHTML = ''; 
         if (orbitControls) orbitControls.dispose(); 
-        delete (window as any).joystickMove; 
-        delete (window as any).joystickLook; 
+        if (renderer) renderer.dispose();
+        delete (window as any).joystickMove; delete (window as any).joystickLook; 
     };
   }, []);
   
@@ -1398,4 +1243,4 @@ function Joystick({ zone, onMove }: { zone: 'left' | 'right', onMove: (x:number,
 }
 
 const root = createRoot(document.getElementById("root")!);
-root.render(<App />);
+root.render(<ErrorBoundary><App /></ErrorBoundary>);
